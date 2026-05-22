@@ -1,0 +1,212 @@
+'use client';
+
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useAppState } from '@/lib/hooks/useAppState';
+
+import Header from './layout/Header';
+import Navigation from './layout/Navigation';
+import type { ViewKey } from './layout/Navigation';
+
+import Leaderboard from './views/Leaderboard';
+import CrewGrid from './views/CrewGrid';
+import HallOfFame from './views/HallOfFame';
+import Settings from './views/Settings';
+
+import AwardPanel from './modals/AwardPanel';
+import BulkAwardPanel from './modals/BulkAwardPanel';
+import AssociateProfile from './modals/AssociateProfile';
+import TierCelebration from './modals/TierCelebration';
+import POTDCeremony from './modals/POTDCeremony';
+import EndShiftSummary from './modals/EndShiftSummary';
+
+export default function Dashboard() {
+  const { state, dispatch } = useAppState();
+  const [activeView, setActiveView]       = useState<ViewKey>('leaderboard');
+  const [profileId, setProfileId]         = useState<string | null>(null);
+  const [awardTargetId, setAwardTargetId] = useState<string | null>(null);
+  const [bulkTargetIds, setBulkTargetIds] = useState<string[] | null>(null);
+  const [showEndShift, setShowEndShift]   = useState(false);
+  const [showPOTD, setShowPOTD]           = useState(false);
+
+  // Undo toast state
+  const [undoToast, setUndoToast] = useState<{ name: string; points: number } | null>(null);
+  const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Watch lastAward — show/refresh undo toast
+  useEffect(() => {
+    if (!state.lastAward) {
+      setUndoToast(null);
+      return;
+    }
+    const assoc = state.associates.find(a => a.id === state.lastAward!.associateId);
+    if (assoc) {
+      setUndoToast({ name: assoc.displayName, points: state.lastAward.event.points });
+      if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+      undoTimerRef.current = setTimeout(() => {
+        dispatch({ type: 'CLEAR_LAST_AWARD' });
+      }, 8000);
+    }
+    return () => { if (undoTimerRef.current) clearTimeout(undoTimerRef.current); };
+  }, [state.lastAward, state.associates, dispatch]);
+
+  function handleUndo() {
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    dispatch({ type: 'UNDO_AWARD' });
+  }
+
+  // Watch for pending POTD trigger
+  useEffect(() => {
+    if (state.pendingPOTD) setShowPOTD(true);
+  }, [state.pendingPOTD]);
+
+  const handleOpenProfile = useCallback((id: string) => {
+    setAwardTargetId(null);
+    setProfileId(id);
+  }, []);
+
+  const handleOpenAward = useCallback((id: string) => {
+    setProfileId(null);
+    setAwardTargetId(id);
+  }, []);
+
+  const handleBulkAward = useCallback((ids: string[]) => {
+    setBulkTargetIds(ids);
+  }, []);
+
+  const handleEndShift = useCallback(() => {
+    dispatch({ type: 'END_SHIFT' });
+    setShowEndShift(true);
+  }, [dispatch]);
+
+  const handleStartNewShift = useCallback(() => {
+    dispatch({ type: 'START_SHIFT' });
+  }, [dispatch]);
+
+  const VIEW_COMPONENTS: Record<ViewKey, React.ReactNode> = useMemo(() => ({
+    leaderboard: (
+      <Leaderboard
+        onCardClick={handleOpenProfile}
+        onAwardClick={handleOpenAward}
+      />
+    ),
+    crew: (
+      <CrewGrid
+        onCardClick={handleOpenProfile}
+        onAwardClick={handleOpenAward}
+        onBulkAward={handleBulkAward}
+      />
+    ),
+    halloffame: <HallOfFame />,
+    settings: <Settings />,
+  }), [handleOpenProfile, handleOpenAward, handleBulkAward]);
+
+  const hasPendingCelebration = !!state.pendingCelebration;
+
+  return (
+    <div className="relative h-screen w-screen flex flex-col overflow-hidden bg-[#F5F3EE]">
+      <div className="flex flex-col h-full">
+        <Header onEndShift={handleEndShift} onCrownPOTD={() => setShowPOTD(true)} />
+        <Navigation active={activeView} onChange={setActiveView} />
+
+        <main className="flex-1 overflow-hidden relative">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeView}
+              initial={{ opacity: 0, x: 16 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -16 }}
+              transition={{ duration: 0.18, ease: 'easeInOut' }}
+              className="absolute inset-0"
+            >
+              {VIEW_COMPONENTS[activeView]}
+            </motion.div>
+          </AnimatePresence>
+        </main>
+      </div>
+
+      {/* ── Modals / Overlays ─────────────────────────── */}
+      <AnimatePresence>
+        {profileId && !awardTargetId && (
+          <AssociateProfile
+            key={`profile-${profileId}`}
+            id={profileId}
+            onClose={() => setProfileId(null)}
+            onAward={(id) => { setProfileId(null); setAwardTargetId(id); }}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {awardTargetId && (
+          <AwardPanel
+            key={`award-${awardTargetId}`}
+            targetId={awardTargetId}
+            onClose={() => setAwardTargetId(null)}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {bulkTargetIds && bulkTargetIds.length > 0 && (
+          <BulkAwardPanel
+            key="bulk-award"
+            targetIds={bulkTargetIds}
+            onClose={() => setBulkTargetIds(null)}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showEndShift && (
+          <EndShiftSummary
+            key="end-shift"
+            onClose={() => setShowEndShift(false)}
+            onStartNew={handleStartNewShift}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showPOTD && (
+          <POTDCeremony
+            key="potd-ceremony"
+            onClose={() => { setShowPOTD(false); }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Tier celebration */}
+      <AnimatePresence>
+        {hasPendingCelebration && (
+          <TierCelebration
+            key="tier-celebration"
+            onDone={() => {}}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Undo toast */}
+      <AnimatePresence>
+        {undoToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 16, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 16, scale: 0.96 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+            className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[55] flex items-center gap-3 px-4 py-3 bg-[#1C1917] text-white rounded-2xl shadow-xl text-sm font-body whitespace-nowrap"
+          >
+            <span className="text-white/70">+{undoToast.points} pts →</span>
+            <span className="font-semibold">{undoToast.name}</span>
+            <button
+              onClick={handleUndo}
+              className="ml-1 px-3 py-1 bg-white/[0.12] hover:bg-white/[0.22] rounded-lg font-heading text-xs transition-colors"
+            >
+              UNDO
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}

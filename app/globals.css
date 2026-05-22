@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary:    #F5F3EE;
+  --bg-secondary:  #EDEAE5;
+  --bg-card:       #FFFFFF;
+  --bg-card-hover: #FAFAF7;
+  --accent-gold:   #B08C1E;
+  --accent-blue:   #3B78B8;
+  --text-primary:  #1C1917;
+  --text-secondary:#6B6560;
+  --text-muted:    #A8A29E;
+  --border:        #DDD9D2;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Tier gradient classes (used in celebrations & badges) ── */
+.tier-bronze  { background: linear-gradient(135deg, #C8895A, #ECC890); }
+.tier-silver  { background: linear-gradient(135deg, #8A9CAA, #C8D8E0); }
+.tier-gold    { background: linear-gradient(135deg, #9A7010, #C9A840); }
+.tier-diamond { background: linear-gradient(135deg, #2B6BAA, #6EA8D8); }
+.tier-legend  { background: linear-gradient(135deg, #5B21B6, #8B5CF6); }
+.tier-none    { background: transparent; }
+
+/* ── Shimmer overlay (celebration screens only) ─────────── */
+.shimmer-overlay {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.35) 50%, transparent 70%);
+  background-size: 250% 100%;
+  animation: shimmer 3s linear infinite;
+  pointer-events: none;
+}
+
+/* ── Gold glow for #1 rank ─────────────────────────────── */
+.gold-glow-pulse {
+  animation: gold-pulse 3s ease-in-out infinite;
+}
+
+/* ── Scrollbar ─────────────────────────────────────────── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,0.10) transparent;
+}
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.10); border-radius: 2px; }
+
+/* ── Font utilities ────────────────────────────────────── */
+.font-heading { font-family: var(--font-black-ops), 'Black Ops One', cursive; }
+.font-body    { font-family: var(--font-inter), Inter, sans-serif; }
+
+/* ── Keyframes ─────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes gold-pulse {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(176,140,30,0.3), 0 2px 12px rgba(176,140,30,0.08); }
+  50%       { box-shadow: 0 0 0 1px rgba(176,140,30,0.5), 0 2px 20px rgba(176,140,30,0.18); }
+}
+
+@keyframes flame-pulse {
+  0%, 100% { transform: scale(1) rotate(-3deg); }
+  50%       { transform: scale(1.15) rotate(3deg); }
+}
+
+@keyframes float-up {
+  0%   { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-40px); }
+}
+
+/* ── Utility classes ───────────────────────────────────── */
+.flame { display: inline-block; animation: flame-pulse 0.9s ease-in-out infinite; }
+.float-up { animation: float-up 0.8s ease-out forwards; }
+
+/* ── Left accent stripe for tier cards ─────────────────── */
+.accent-bronze  { border-left-color: #C07A3A; }
+.accent-silver  { border-left-color: #8899AA; }
+.accent-gold    { border-left-color: #B08C1E; }
+.accent-diamond { border-left-color: #3B78B8; }
+.accent-legend  { border-left-color: #7C3AED; }
+.accent-none    { border-left-color: #DDD9D2; }
+
+/* ── Modal backdrop ──────────────────────────────────────── */
+.modal-backdrop {
+  background: rgba(28, 25, 23, 0.38);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+}
