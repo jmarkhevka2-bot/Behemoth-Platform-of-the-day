@@ -37,8 +37,7 @@ export default function Leaderboard({ onCardClick, onAwardClick, isAdmin }: Prop
   const tierHolders = useMemo(() => state.associates.filter(a => a.currentTier !== 'none').length, [state.associates]);
   const bestStreak  = useMemo(() => Math.max(...state.associates.map(a => a.streak), 0), [state.associates]);
 
-  // Today's activity feed — all awards from current shift, newest first
-  const todaysFeed = useMemo(() => {
+  const todaysFeed = useMemo((): FeedEvent[] => {
     if (!state.shift.id) return [];
     return state.associates
       .flatMap(a => a.awardHistory
@@ -52,34 +51,22 @@ export default function Leaderboard({ onCardClick, onAwardClick, isAdmin }: Prop
   return (
     <div className="h-full overflow-y-auto px-3 py-3 space-y-1.5">
       {/* Header */}
-      <div className="flex items-center justify-between pb-2 border-b border-[#E8E4DF] mb-2.5">
-        <h2 className="font-heading text-xs tracking-widest text-[#A8A29E]">SEASON STANDINGS</h2>
+      <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)] mb-2.5">
+        <h2 className="font-heading text-xs tracking-widest text-[var(--text-muted)]">SEASON STANDINGS</h2>
         <div className="flex items-center gap-4">
-          <span className="text-[10px] text-[#C4BEB8] font-body">{totalPts} total pts</span>
-          <span className="text-[10px] text-[#C4BEB8] font-body">{tierHolders} tier holders</span>
+          <span className="text-[10px] text-[var(--text-hint)] font-body">{totalPts} total pts</span>
+          <span className="text-[10px] text-[var(--text-hint)] font-body">{tierHolders} tier holders</span>
         </div>
       </div>
 
       {/* Top 10 */}
       <AnimatePresence mode="popLayout">
         {topTen.map((a, index) => (
-          <motion.div
-            key={a.id}
-            layout
-            layoutId={a.id}
-            initial={{ opacity: 0, x: -12 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 12 }}
-            transition={{ type: 'spring', stiffness: 350, damping: 32 }}
-          >
-            <LeaderboardCard
-              associate={a}
-              rank={index + 1}
-              onCardClick={onCardClick}
-              onAwardClick={onAwardClick}
-              isTied={a.seasonPoints > 0 && tiedMap[a.seasonPoints] > 1}
-              isAdmin={isAdmin}
-            />
+          <motion.div key={a.id} layout layoutId={a.id}
+            initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 12 }}
+            transition={{ type: 'spring', stiffness: 350, damping: 32 }}>
+            <LeaderboardCard associate={a} rank={index + 1} onCardClick={onCardClick} onAwardClick={onAwardClick}
+              isTied={a.seasonPoints > 0 && tiedMap[a.seasonPoints] > 1} isAdmin={isAdmin} />
           </motion.div>
         ))}
       </AnimatePresence>
@@ -87,88 +74,72 @@ export default function Leaderboard({ onCardClick, onAwardClick, isAdmin }: Prop
       {/* Remaining crew */}
       {rest.length > 0 && (
         <details className="mt-3">
-          <summary className="text-[11px] text-[#A8A29E] cursor-pointer font-body py-1.5 hover:text-[#6B6560] transition-colors select-none">
+          <summary className="text-[11px] text-[var(--text-muted)] cursor-pointer font-body py-1.5 hover:text-[var(--text-secondary)] transition-colors select-none">
             + {rest.length} more operators
           </summary>
           <div className="mt-2 space-y-1.5">
             {rest.map((a, index) => (
-              <LeaderboardCard
-                key={a.id}
-                associate={a}
-                rank={topTen.length + index + 1}
-                onCardClick={onCardClick}
-                onAwardClick={onAwardClick}
-                isTied={a.seasonPoints > 0 && tiedMap[a.seasonPoints] > 1}
-                isAdmin={isAdmin}
-              />
+              <LeaderboardCard key={a.id} associate={a} rank={topTen.length + index + 1}
+                onCardClick={onCardClick} onAwardClick={onAwardClick}
+                isTied={a.seasonPoints > 0 && tiedMap[a.seasonPoints] > 1} isAdmin={isAdmin} />
             ))}
           </div>
         </details>
       )}
 
       {/* Season stats */}
-      <div className="mt-4 pt-3 border-t border-[#E8E4DF]">
+      <div className="mt-4 pt-3 border-t border-[var(--border-subtle)]">
         <div className="grid grid-cols-3 gap-3 text-center">
           <div>
-            <p className="font-heading text-[#B08C1E] text-xl">{totalPts}</p>
-            <p className="text-[10px] text-[#A8A29E] font-body mt-0.5">Total Pts</p>
+            <p className="font-heading text-[var(--accent-gold)] text-xl">{totalPts}</p>
+            <p className="text-[10px] text-[var(--text-muted)] font-body mt-0.5">Total Pts</p>
           </div>
           <div>
-            <p className="font-heading text-[#3B78B8] text-xl">{tierHolders}</p>
-            <p className="text-[10px] text-[#A8A29E] font-body mt-0.5">Tier Holders</p>
+            <p className="font-heading text-[var(--accent-blue)] text-xl">{tierHolders}</p>
+            <p className="text-[10px] text-[var(--text-muted)] font-body mt-0.5">Tier Holders</p>
           </div>
           <div>
-            <p className="font-heading text-[#1C1917] text-xl">{bestStreak}</p>
-            <p className="text-[10px] text-[#A8A29E] font-body mt-0.5">Best Streak</p>
+            <p className="font-heading text-[var(--text-primary)] text-xl">{bestStreak}</p>
+            <p className="text-[10px] text-[var(--text-muted)] font-body mt-0.5">Best Streak</p>
           </div>
         </div>
       </div>
 
       {/* Today's activity feed */}
-      <div className="mt-3 border-t border-[#E8E4DF] pt-3">
+      <div className="mt-3 border-t border-[var(--border-subtle)] pt-3">
         <button
           onClick={() => setFeedOpen(v => !v)}
-          className="w-full flex items-center justify-between text-[11px] text-[#A8A29E] font-body hover:text-[#6B6560] transition-colors py-1 select-none"
+          className="w-full flex items-center justify-between text-[11px] text-[var(--text-muted)] font-body hover:text-[var(--text-secondary)] transition-colors py-1 select-none"
         >
           <span className="font-heading tracking-widest text-[10px]">TODAY&apos;S ACTIVITY</span>
           <span className="flex items-center gap-1.5">
             {todaysFeed.length > 0 && (
-              <span className="px-1.5 py-0.5 bg-[#F5F3EE] border border-[#DDD9D2] rounded-md text-[10px]">
+              <span className="px-1.5 py-0.5 bg-[var(--bg-secondary)] border border-[var(--border)] rounded-md text-[10px]">
                 {todaysFeed.length}
               </span>
             )}
             <span className={`transition-transform ${feedOpen ? 'rotate-180' : ''}`}>▾</span>
           </span>
         </button>
-
         <AnimatePresence>
           {feedOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="overflow-hidden"
-            >
+            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
               {todaysFeed.length === 0 ? (
-                <p className="text-xs text-[#C4BEB8] font-body py-3 text-center">No awards given yet this shift</p>
+                <p className="text-xs text-[var(--text-hint)] font-body py-3 text-center">No awards given yet this shift</p>
               ) : (
                 <div className="mt-2 space-y-1 max-h-64 overflow-y-auto">
                   {todaysFeed.map(ev => {
                     const meta = ev.reasonTag !== 'custom' ? REASON_TAG_META[ev.reasonTag] : null;
                     const isDeduction = ev.points < 0;
                     return (
-                      <div
-                        key={ev.id}
-                        className="flex items-center gap-2 px-3 py-2 bg-white border border-[#E8E4DF] rounded-xl text-xs"
-                      >
+                      <div key={ev.id} className="flex items-center gap-2 px-3 py-2 bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-xl text-xs">
                         <span className="text-base leading-none flex-shrink-0">{ev.associateEmoji}</span>
-                        <span className="text-[#6B6560] font-body flex-shrink-0">{ev.associateName}</span>
-                        <span className="flex-1 text-[#A8A29E] font-body truncate">{meta?.emoji ?? '✏️'} {ev.reason}</span>
-                        <span className={`font-heading flex-shrink-0 ${isDeduction ? 'text-red-500' : 'text-[#B08C1E]'}`}>
+                        <span className="text-[var(--text-secondary)] font-body flex-shrink-0">{ev.associateName}</span>
+                        <span className="flex-1 text-[var(--text-muted)] font-body truncate">{meta?.emoji ?? '✏️'} {ev.reason}</span>
+                        <span className={`font-heading flex-shrink-0 ${isDeduction ? 'text-red-500' : 'text-[var(--accent-gold)]'}`}>
                           {isDeduction ? ev.points : `+${ev.points}`}
                         </span>
-                        <span className="text-[#C4BEB8] font-body flex-shrink-0">{formatTimestamp(ev.timestamp)}</span>
+                        <span className="text-[var(--text-hint)] font-body flex-shrink-0">{formatTimestamp(ev.timestamp)}</span>
                       </div>
                     );
                   })}

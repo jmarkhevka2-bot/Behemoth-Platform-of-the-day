@@ -9,6 +9,28 @@ export type ReasonTag =
   | 'potd'
   | 'above_beyond';
 
+export type BadgeKey =
+  | 'first_blood'
+  | 'on_fire'
+  | 'hat_trick'
+  | 'eagle_eye'
+  | 'supersonic'
+  | 'crowd_control'
+  | 'untouchable'
+  | 'born_legend'
+  | 'day_one'
+  | 'full_send'
+  | 'team_player'
+  | 'summit'
+  | 'bullseye'
+  | 'rival'
+  | 'rising_star';
+
+export interface BadgeEntry {
+  key: BadgeKey;
+  unlockedAt: string; // ISO timestamp
+}
+
 export interface AwardEvent {
   id: string;
   associateId: string;
@@ -35,6 +57,7 @@ export interface Associate {
   tiersUnlocked: Tier[];
   notes: string;
   awardHistory: AwardEvent[];
+  badges: BadgeEntry[];
 }
 
 export interface ShiftState {
@@ -80,4 +103,5 @@ export interface AppState {
   pendingPOTD: boolean;
   lastEndShiftData: EndShiftData | null;
   lastAward: { event: AwardEvent; associateId: string } | null;
+  pendingBadgeUnlocks: Array<{ associateId: string; badge: BadgeKey }>;
 }

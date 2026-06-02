@@ -24,9 +24,25 @@ export const metadata: Metadata = {
   description: 'Crew recognition dashboard for Behemoth ride operations.',
 };
 
+// Inline script to apply saved theme before first paint (avoids flash)
+const themeScript = `
+(function(){
+  try {
+    var t = localStorage.getItem('behemoth-theme');
+    document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
+  } catch(e) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+})();
+`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${blackOps.variable} ${inter.variable} dark`}>
+    <html lang="en" className={`${blackOps.variable} ${inter.variable}`}>
+      <head>
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="font-body antialiased">
         <AppProvider>{children}</AppProvider>
       </body>

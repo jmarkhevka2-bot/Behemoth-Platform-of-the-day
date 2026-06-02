@@ -77,6 +77,7 @@ export async function fetchStateFromSupabase(): Promise<AppState | null> {
     tiersUnlocked: (row.tiers_unlocked as Tier[]) ?? [],
     notes:         row.notes ?? '',
     awardHistory:  eventsByAssociate[row.id] ?? [],
+    badges:        (row.badges as import('./types').BadgeEntry[]) ?? [],
   }));
 
   return {
@@ -101,6 +102,7 @@ export async function fetchStateFromSupabase(): Promise<AppState | null> {
     pendingPOTD:         false,
     lastEndShiftData:    null,
     lastAward:           null,
+    pendingBadgeUnlocks: [],
   };
 }
 
@@ -125,6 +127,7 @@ export async function syncToSupabase(
     last_awarded_date: a.lastPointDate ?? null,
     notes:             a.notes,
     tiers_unlocked:    a.tiersUnlocked,
+    badges:            a.badges,
   }));
 
   // 2. Upsert season_settings

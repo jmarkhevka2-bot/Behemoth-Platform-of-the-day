@@ -2,17 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── LIGHT THEME (default) ────────────────────────────────── */
 :root {
   --bg-primary:    #F5F3EE;
   --bg-secondary:  #EDEAE5;
   --bg-card:       #FFFFFF;
   --bg-card-hover: #FAFAF7;
-  --accent-gold:   #B08C1E;
-  --accent-blue:   #3B78B8;
+  --bg-input:      #F5F3EE;
   --text-primary:  #1C1917;
   --text-secondary:#6B6560;
   --text-muted:    #A8A29E;
+  --text-hint:     #C4BEB8;
   --border:        #DDD9D2;
+  --border-subtle: #E8E4DF;
+  --accent-gold:   #B08C1E;
+  --accent-blue:   #3B78B8;
+  --modal-bg:      rgba(28, 25, 23, 0.38);
+}
+
+/* ── DARK THEME ────────────────────────────────────────────── */
+[data-theme="dark"] {
+  --bg-primary:    #0D0D0D;
+  --bg-secondary:  #171412;
+  --bg-card:       #2D2A27;
+  --bg-card-hover: #353230;
+  --bg-input:      #1C1917;
+  --text-primary:  #F0EDE8;
+  --text-secondary:#9A948E;
+  --text-muted:    #6B6560;
+  --text-hint:     #4A4540;
+  --border:        #3A3632;
+  --border-subtle: #302C29;
+  --accent-gold:   #C9A840;
+  --accent-blue:   #4B88C8;
+  --modal-bg:      rgba(0, 0, 0, 0.72);
 }
 
 html, body {
@@ -25,6 +48,24 @@ body {
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Smooth theme transitions */
+  transition: background-color 0.25s ease, color 0.15s ease;
+}
+
+/* Apply smooth transitions to theme-sensitive elements */
+*, *::before, *::after {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.15s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Exclude animated elements from theme transition */
+.shimmer-overlay::after,
+[class*="animate-"],
+[class*="motion-"] {
+  transition: none !important;
 }
 
 /* ── Tier gradient classes (used in celebrations & badges) ── */
@@ -48,6 +89,7 @@ body {
   background-size: 250% 100%;
   animation: shimmer 3s linear infinite;
   pointer-events: none;
+  transition: none;
 }
 
 /* ── Gold glow for #1 rank ─────────────────────────────── */
@@ -58,11 +100,11 @@ body {
 /* ── Scrollbar ─────────────────────────────────────────── */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(0,0,0,0.10) transparent;
+  scrollbar-color: rgba(128,128,128,0.15) transparent;
 }
 ::-webkit-scrollbar { width: 3px; height: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.10); border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.15); border-radius: 2px; }
 
 /* ── Font utilities ────────────────────────────────────── */
 .font-heading { font-family: var(--font-black-ops), 'Black Ops One', cursive; }
@@ -89,9 +131,16 @@ body {
   100% { opacity: 0; transform: translateY(-40px); }
 }
 
+@keyframes badge-in {
+  0%   { opacity: 0; transform: translateX(100%) scale(0.9); }
+  60%  { transform: translateX(-6px) scale(1.04); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+
 /* ── Utility classes ───────────────────────────────────── */
-.flame { display: inline-block; animation: flame-pulse 0.9s ease-in-out infinite; }
-.float-up { animation: float-up 0.8s ease-out forwards; }
+.flame     { display: inline-block; animation: flame-pulse 0.9s ease-in-out infinite; transition: none !important; }
+.float-up  { animation: float-up 0.8s ease-out forwards; }
+.badge-in  { animation: badge-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
 
 /* ── Left accent stripe for tier cards ─────────────────── */
 .accent-bronze  { border-left-color: #C07A3A; }
@@ -99,13 +148,24 @@ body {
 .accent-gold    { border-left-color: #B08C1E; }
 .accent-diamond { border-left-color: #3B78B8; }
 .accent-legend  { border-left-color: #7C3AED; }
-.accent-none    { border-left-color: #DDD9D2; }
+.accent-none    { border-left-color: var(--border); }
 
 /* ── Modal backdrop ──────────────────────────────────────── */
 .modal-backdrop {
-  background: rgba(28, 25, 23, 0.38);
+  background: var(--modal-bg);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+}
+
+/* ── Multi-POTD gold pulse for selected cards ─────────────── */
+.potd-selected-glow {
+  box-shadow: 0 0 0 2px #C9A840, 0 0 12px rgba(201,168,64,0.3);
+  animation: potd-glow-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes potd-glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 2px #C9A840, 0 0 8px rgba(201,168,64,0.25); }
+  50%       { box-shadow: 0 0 0 2px #C9A840, 0 0 20px rgba(201,168,64,0.5); }
 }
 
 @layer utilities {

@@ -19,6 +19,7 @@ import AssociateProfile from './modals/AssociateProfile';
 import TierCelebration from './modals/TierCelebration';
 import POTDCeremony from './modals/POTDCeremony';
 import EndShiftSummary from './modals/EndShiftSummary';
+import BadgeUnlockToast from './ui/BadgeUnlockToast';
 
 interface Props {
   isAdmin: boolean;
@@ -33,23 +34,17 @@ export default function Dashboard({ isAdmin }: Props) {
   const [showEndShift, setShowEndShift]   = useState(false);
   const [showPOTD, setShowPOTD]           = useState(false);
 
-  // Undo toast state
+  // Undo toast
   const [undoToast, setUndoToast] = useState<{ name: string; points: number } | null>(null);
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Watch lastAward — show/refresh undo toast
   useEffect(() => {
-    if (!state.lastAward) {
-      setUndoToast(null);
-      return;
-    }
+    if (!state.lastAward) { setUndoToast(null); return; }
     const assoc = state.associates.find(a => a.id === state.lastAward!.associateId);
     if (assoc) {
       setUndoToast({ name: assoc.displayName, points: state.lastAward.event.points });
       if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
-      undoTimerRef.current = setTimeout(() => {
-        dispatch({ type: 'CLEAR_LAST_AWARD' });
-      }, 8000);
+      undoTimerRef.current = setTimeout(() => dispatch({ type: 'CLEAR_LAST_AWARD' }), 8000);
     }
     return () => { if (undoTimerRef.current) clearTimeout(undoTimerRef.current); };
   }, [state.lastAward, state.associates, dispatch]);
@@ -59,159 +54,121 @@ export default function Dashboard({ isAdmin }: Props) {
     dispatch({ type: 'UNDO_AWARD' });
   }
 
-  // Watch for pending POTD trigger
+  // Badge unlock toast — show one at a time, dismiss after 4s
+  const badgeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const currentBadge = state.pendingBadgeUnlocks[0] ?? null;
+
   useEffect(() => {
-    if (state.pendingPOTD) setShowPOTD(true);
-  }, [state.pendingPOTD]);
+    if (!currentBadge) return;
+    if (badgeTimerRef.current) clearTimeout(badgeTimerRef.current);
+    badgeTimerRef.current = setTimeout(() => dispatch({ type: 'SHIFT_BADGE_UNLOCK' }), 4000);
+    return () => { if (badgeTimerRef.current) clearTimeout(badgeTimerRef.current); };
+  }, [currentBadge, dispatch]);
 
-  const handleOpenProfile = useCallback((id: string) => {
-    setAwardTargetId(null);
-    setProfileId(id);
-  }, []);
+  const badgeAssociate = currentBadge
+    ? state.associates.find(a => a.id === currentBadge.associateId)
+    : null;
 
-  const handleOpenAward = useCallback((id: string) => {
-    setProfileId(null);
-    setAwardTargetId(id);
-  }, []);
+  // POTD trigger
+  useEffect(() => { if (state.pendingPOTD) setShowPOTD(true); }, [state.pendingPOTD]);
 
-  const handleBulkAward = useCallback((ids: string[]) => {
-    setBulkTargetIds(ids);
-  }, []);
-
-  const handleEndShift = useCallback(() => {
-    dispatch({ type: 'END_SHIFT' });
-    setShowEndShift(true);
-  }, [dispatch]);
-
-  const handleStartNewShift = useCallback(() => {
-    dispatch({ type: 'START_SHIFT' });
-  }, [dispatch]);
+  const handleOpenProfile = useCallback((id: string) => { setAwardTargetId(null); setProfileId(id); }, []);
+  const handleOpenAward   = useCallback((id: string) => { setProfileId(null); setAwardTargetId(id); }, []);
+  const handleBulkAward   = useCallback((ids: string[]) => setBulkTargetIds(ids), []);
+  const handleEndShift    = useCallback(() => { dispatch({ type: 'END_SHIFT' }); setShowEndShift(true); }, [dispatch]);
+  const handleStartNew    = useCallback(() => dispatch({ type: 'START_SHIFT' }), [dispatch]);
 
   const VIEW_COMPONENTS: Record<ViewKey, React.ReactNode> = useMemo(() => ({
-    leaderboard: (
-      <Leaderboard
-        onCardClick={handleOpenProfile}
-        onAwardClick={handleOpenAward}
-        isAdmin={isAdmin}
-      />
-    ),
-    crew: (
-      <CrewGrid
-        onCardClick={handleOpenProfile}
-        onAwardClick={handleOpenAward}
-        onBulkAward={handleBulkAward}
-        isAdmin={isAdmin}
-      />
-    ),
-    halloffame: <HallOfFame />,
-    settings:   <Settings />,
+    leaderboard: <Leaderboard onCardClick={handleOpenProfile} onAwardClick={handleOpenAward} isAdmin={isAdmin} />,
+    crew:        <CrewGrid onCardClick={handleOpenProfile} onAwardClick={handleOpenAward} onBulkAward={handleBulkAward} isAdmin={isAdmin} />,
+    halloffame:  <HallOfFame />,
+    settings:    <Settings />,
   }), [handleOpenProfile, handleOpenAward, handleBulkAward, isAdmin]);
 
-  const hasPendingCelebration = !!state.pendingCelebration;
-
   return (
-    <div className="relative h-screen w-screen flex flex-col overflow-hidden bg-[#F5F3EE]">
+    <div className="relative h-screen w-screen flex flex-col overflow-hidden bg-[var(--bg-primary)]">
       <div className="flex flex-col h-full">
         <Header onEndShift={handleEndShift} onCrownPOTD={() => setShowPOTD(true)} isAdmin={isAdmin} />
         <Navigation active={activeView} onChange={setActiveView} isAdmin={isAdmin} />
 
         <main className="flex-1 overflow-hidden relative">
           <AnimatePresence mode="wait">
-            <motion.div
-              key={activeView}
-              initial={{ opacity: 0, x: 16 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -16 }}
+            <motion.div key={activeView}
+              initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }}
               transition={{ duration: 0.18, ease: 'easeInOut' }}
-              className="absolute inset-0"
-            >
+              className="absolute inset-0">
               {VIEW_COMPONENTS[activeView]}
             </motion.div>
           </AnimatePresence>
         </main>
       </div>
 
-      {/* ── Modals / Overlays ─────────────────────────── */}
+      {/* ── Modals ─────────────────────────────────────── */}
       <AnimatePresence>
         {profileId && !awardTargetId && (
-          <AssociateProfile
-            key={`profile-${profileId}`}
-            id={profileId}
+          <AssociateProfile key={`profile-${profileId}`} id={profileId}
             onClose={() => setProfileId(null)}
             onAward={(id) => { setProfileId(null); setAwardTargetId(id); }}
-            isAdmin={isAdmin}
-          />
+            isAdmin={isAdmin} />
         )}
       </AnimatePresence>
 
       <AnimatePresence>
         {awardTargetId && (
-          <AwardPanel
-            key={`award-${awardTargetId}`}
-            targetId={awardTargetId}
-            onClose={() => setAwardTargetId(null)}
-          />
+          <AwardPanel key={`award-${awardTargetId}`} targetId={awardTargetId} onClose={() => setAwardTargetId(null)} />
         )}
       </AnimatePresence>
 
       <AnimatePresence>
         {bulkTargetIds && bulkTargetIds.length > 0 && (
-          <BulkAwardPanel
-            key="bulk-award"
-            targetIds={bulkTargetIds}
-            onClose={() => setBulkTargetIds(null)}
-          />
+          <BulkAwardPanel key="bulk-award" targetIds={bulkTargetIds} onClose={() => setBulkTargetIds(null)} />
         )}
       </AnimatePresence>
 
       <AnimatePresence>
         {showEndShift && (
-          <EndShiftSummary
-            key="end-shift"
-            onClose={() => setShowEndShift(false)}
-            onStartNew={handleStartNewShift}
-          />
+          <EndShiftSummary key="end-shift" onClose={() => setShowEndShift(false)} onStartNew={handleStartNew} />
         )}
       </AnimatePresence>
 
       <AnimatePresence>
         {showPOTD && (
-          <POTDCeremony
-            key="potd-ceremony"
-            onClose={() => { setShowPOTD(false); }}
-          />
+          <POTDCeremony key="potd-ceremony" onClose={() => setShowPOTD(false)} />
         )}
       </AnimatePresence>
 
-      {/* Tier celebration */}
       <AnimatePresence>
-        {hasPendingCelebration && (
-          <TierCelebration
-            key="tier-celebration"
-            onDone={() => {}}
-          />
+        {!!state.pendingCelebration && (
+          <TierCelebration key="tier-celebration" onDone={() => {}} />
         )}
       </AnimatePresence>
 
-      {/* Undo toast */}
+      {/* ── Undo toast ──────────────────────────────────── */}
       <AnimatePresence>
         {undoToast && (
-          <motion.div
-            initial={{ opacity: 0, y: 16, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 16, scale: 0.96 }}
+          <motion.div initial={{ opacity: 0, y: 16, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 16, scale: 0.96 }}
             transition={{ type: 'spring', stiffness: 400, damping: 32 }}
-            className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[55] flex items-center gap-3 px-4 py-3 bg-[#1C1917] text-white rounded-2xl shadow-xl text-sm font-body whitespace-nowrap"
-          >
+            className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[55] flex items-center gap-3 px-4 py-3 bg-[#1C1917] text-white rounded-2xl shadow-xl text-sm font-body whitespace-nowrap">
             <span className="text-white/70">+{undoToast.points} pts →</span>
             <span className="font-semibold">{undoToast.name}</span>
-            <button
-              onClick={handleUndo}
-              className="ml-1 px-3 py-1 bg-white/[0.12] hover:bg-white/[0.22] rounded-lg font-heading text-xs transition-colors"
-            >
+            <button onClick={handleUndo}
+              className="ml-1 px-3 py-1 bg-white/[0.12] hover:bg-white/[0.22] rounded-lg font-heading text-xs transition-colors">
               UNDO
             </button>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Badge unlock toast ──────────────────────────── */}
+      <AnimatePresence>
+        {currentBadge && badgeAssociate && (
+          <BadgeUnlockToast
+            key={`${currentBadge.associateId}-${currentBadge.badge}`}
+            badge={currentBadge.badge}
+            associateName={badgeAssociate.displayName}
+            associateEmoji={badgeAssociate.emoji}
+            onDismiss={() => dispatch({ type: 'SHIFT_BADGE_UNLOCK' })}
+          />
         )}
       </AnimatePresence>
     </div>

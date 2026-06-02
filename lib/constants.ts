@@ -70,6 +70,7 @@ export const INITIAL_ASSOCIATES: Associate[] = ROSTER.map((r, i) => ({
   tiersUnlocked: [],
   notes: '',
   awardHistory: [],
+  badges: [],
 }));
 
 export const DEFAULT_TIER_CONFIGS: TierConfig[] = [
@@ -153,4 +154,5 @@ export const INITIAL_STATE: AppState = {
   pendingPOTD: false,
   lastEndShiftData: null,
   lastAward: null,
+  pendingBadgeUnlocks: [],
 };
