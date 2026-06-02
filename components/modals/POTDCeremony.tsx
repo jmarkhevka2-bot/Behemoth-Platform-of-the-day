@@ -16,7 +16,7 @@ interface Props {
 type Stage = 'select' | 'ceremony';
 
 export default function POTDCeremony({ onClose }: Props) {
-  const { state, dispatch } = useAppState();
+  const { dispatch } = useAppState();
   const sorted = useSortedByDailyPoints();
   const { playPOTD } = useSound();
   const [stage, setStage] = useState<Stage>('select');

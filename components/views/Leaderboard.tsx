@@ -7,13 +7,20 @@ import { useSortedLeaderboard } from '@/lib/hooks/useAppState';
 import { REASON_TAG_META } from '@/lib/constants';
 import { formatTimestamp } from '@/lib/utils/dates';
 import LeaderboardCard from '@/components/ui/LeaderboardCard';
+import type { AwardEvent } from '@/lib/types';
+
+interface FeedEvent extends AwardEvent {
+  associateName: string;
+  associateEmoji: string;
+}
 
 interface Props {
   onCardClick: (id: string) => void;
   onAwardClick: (id: string) => void;
+  isAdmin: boolean;
 }
 
-export default function Leaderboard({ onCardClick, onAwardClick }: Props) {
+export default function Leaderboard({ onCardClick, onAwardClick, isAdmin }: Props) {
   const { state } = useAppState();
   const sorted    = useSortedLeaderboard();
   const topTen    = sorted.slice(0, 10);
@@ -36,7 +43,7 @@ export default function Leaderboard({ onCardClick, onAwardClick }: Props) {
     return state.associates
       .flatMap(a => a.awardHistory
         .filter(e => e.shiftId === state.shift.id)
-        .map(e => ({ ...e, associateName: a.displayName, associateEmoji: a.emoji }))
+        .map((e): FeedEvent => ({ ...e, associateName: a.displayName, associateEmoji: a.emoji }))
       )
       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
       .slice(0, 30);
@@ -71,6 +78,7 @@ export default function Leaderboard({ onCardClick, onAwardClick }: Props) {
               onCardClick={onCardClick}
               onAwardClick={onAwardClick}
               isTied={a.seasonPoints > 0 && tiedMap[a.seasonPoints] > 1}
+              isAdmin={isAdmin}
             />
           </motion.div>
         ))}
@@ -91,6 +99,7 @@ export default function Leaderboard({ onCardClick, onAwardClick }: Props) {
                 onCardClick={onCardClick}
                 onAwardClick={onAwardClick}
                 isTied={a.seasonPoints > 0 && tiedMap[a.seasonPoints] > 1}
+                isAdmin={isAdmin}
               />
             ))}
           </div>
@@ -153,8 +162,8 @@ export default function Leaderboard({ onCardClick, onAwardClick }: Props) {
                         key={ev.id}
                         className="flex items-center gap-2 px-3 py-2 bg-white border border-[#E8E4DF] rounded-xl text-xs"
                       >
-                        <span className="text-base leading-none flex-shrink-0">{(ev as any).associateEmoji}</span>
-                        <span className="text-[#6B6560] font-body flex-shrink-0">{(ev as any).associateName}</span>
+                        <span className="text-base leading-none flex-shrink-0">{ev.associateEmoji}</span>
+                        <span className="text-[#6B6560] font-body flex-shrink-0">{ev.associateName}</span>
                         <span className="flex-1 text-[#A8A29E] font-body truncate">{meta?.emoji ?? '✏️'} {ev.reason}</span>
                         <span className={`font-heading flex-shrink-0 ${isDeduction ? 'text-red-500' : 'text-[#B08C1E]'}`}>
                           {isDeduction ? ev.points : `+${ev.points}`}

@@ -13,6 +13,7 @@ interface Props {
   id: string;
   onClose: () => void;
   onAward: (id: string) => void;
+  isAdmin: boolean;
 }
 
 const RING_COLOR: Record<string, string> = {
@@ -24,7 +25,7 @@ const RING_COLOR: Record<string, string> = {
   legend:  '#7C3AED',
 };
 
-export default function AssociateProfile({ id, onClose, onAward }: Props) {
+export default function AssociateProfile({ id, onClose, onAward, isAdmin }: Props) {
   const { state, dispatch } = useAppState();
   const associate = useAssociateById(id);
   const [editingEmoji, setEditingEmoji] = useState(false);
@@ -77,49 +78,62 @@ export default function AssociateProfile({ id, onClose, onAward }: Props) {
         {/* Hero */}
         <div className="px-5 pt-5 pb-4 border-b border-[#E8E4DF]">
           <div className="flex items-start justify-between mb-3">
-            {editingEmoji ? (
-              <div className="flex gap-2">
-                <input
-                  autoFocus
-                  type="text"
-                  value={emojiInput}
-                  onChange={e => setEmojiInput(e.target.value)}
-                  className="w-14 text-center text-2xl bg-[#F5F3EE] border border-[#DDD9D2] rounded-xl px-2 py-1 outline-none"
-                  onKeyDown={e => { if (e.key === 'Enter') saveEmoji(); if (e.key === 'Escape') setEditingEmoji(false); }}
-                />
-                <button onClick={saveEmoji} className="px-2.5 py-1 bg-[#F5F3EE] border border-[#DDD9D2] rounded-xl text-sm text-[#6B6560]">✓</button>
-              </div>
+            {/* Emoji — editable for admin only */}
+            {isAdmin ? (
+              editingEmoji ? (
+                <div className="flex gap-2">
+                  <input
+                    autoFocus
+                    type="text"
+                    value={emojiInput}
+                    onChange={e => setEmojiInput(e.target.value)}
+                    className="w-14 text-center text-2xl bg-[#F5F3EE] border border-[#DDD9D2] rounded-xl px-2 py-1 outline-none"
+                    onKeyDown={e => { if (e.key === 'Enter') saveEmoji(); if (e.key === 'Escape') setEditingEmoji(false); }}
+                  />
+                  <button onClick={saveEmoji} className="px-2.5 py-1 bg-[#F5F3EE] border border-[#DDD9D2] rounded-xl text-sm text-[#6B6560]">✓</button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => { setEmojiInput(a.emoji); setEditingEmoji(true); }}
+                  className="text-4xl leading-none hover:scale-110 transition-transform"
+                  title="Change emoji"
+                >
+                  {a.emoji}
+                </button>
+              )
             ) : (
-              <button
-                onClick={() => { setEmojiInput(a.emoji); setEditingEmoji(true); }}
-                className="text-4xl leading-none hover:scale-110 transition-transform"
-                title="Change emoji"
-              >
-                {a.emoji}
-              </button>
+              <span className="text-4xl leading-none">{a.emoji}</span>
             )}
             <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-lg text-[#A8A29E] hover:text-[#6B6560] hover:bg-[#F5F3EE] transition-colors">✕</button>
           </div>
 
-          {editingName ? (
-            <div className="flex gap-2 mb-2">
-              <input
-                autoFocus
-                type="text"
-                value={nameInput}
-                onChange={e => setNameInput(e.target.value)}
-                className="flex-1 bg-[#F5F3EE] border border-[#DDD9D2] rounded-xl px-3 py-1.5 text-lg font-body font-semibold text-[#1C1917] outline-none"
-                onKeyDown={e => { if (e.key === 'Enter') saveName(); if (e.key === 'Escape') setEditingName(false); }}
-              />
-              <button onClick={saveName} className="px-2.5 py-1 bg-[#F5F3EE] border border-[#DDD9D2] rounded-xl text-sm text-[#6B6560]">✓</button>
-            </div>
+          {/* Name — editable for admin only */}
+          {isAdmin ? (
+            editingName ? (
+              <div className="flex gap-2 mb-2">
+                <input
+                  autoFocus
+                  type="text"
+                  value={nameInput}
+                  onChange={e => setNameInput(e.target.value)}
+                  className="flex-1 bg-[#F5F3EE] border border-[#DDD9D2] rounded-xl px-3 py-1.5 text-lg font-body font-semibold text-[#1C1917] outline-none"
+                  onKeyDown={e => { if (e.key === 'Enter') saveName(); if (e.key === 'Escape') setEditingName(false); }}
+                />
+                <button onClick={saveName} className="px-2.5 py-1 bg-[#F5F3EE] border border-[#DDD9D2] rounded-xl text-sm text-[#6B6560]">✓</button>
+              </div>
+            ) : (
+              <button onClick={() => { setNameInput(a.displayName); setEditingName(true); }} className="text-left mb-1">
+                <p className="font-body font-semibold text-[#1C1917] text-xl leading-tight hover:text-[#6B6560] transition-colors">
+                  {a.displayName}
+                </p>
+                <p className="text-[#A8A29E] text-sm font-body">{a.lastName}</p>
+              </button>
+            )
           ) : (
-            <button onClick={() => { setNameInput(a.displayName); setEditingName(true); }} className="text-left mb-1">
-              <p className="font-body font-semibold text-[#1C1917] text-xl leading-tight hover:text-[#6B6560] transition-colors">
-                {a.displayName}
-              </p>
+            <div className="text-left mb-1">
+              <p className="font-body font-semibold text-[#1C1917] text-xl leading-tight">{a.displayName}</p>
               <p className="text-[#A8A29E] text-sm font-body">{a.lastName}</p>
-            </button>
+            </div>
           )}
 
           <div className="mt-2">
@@ -181,11 +195,12 @@ export default function AssociateProfile({ id, onClose, onAward }: Props) {
             <p className="text-[10px] text-[#A8A29E] font-body mb-1.5 uppercase tracking-wider">Notes</p>
             <textarea
               value={notesValue}
-              onChange={e => setNotesValue(e.target.value)}
-              onBlur={handleNotesBlur}
-              placeholder="e.g. strong loader, great spiel..."
+              onChange={isAdmin ? e => setNotesValue(e.target.value) : undefined}
+              onBlur={isAdmin ? handleNotesBlur : undefined}
+              readOnly={!isAdmin}
+              placeholder={isAdmin ? 'e.g. strong loader, great spiel...' : '—'}
               rows={2}
-              className="w-full bg-[#F5F3EE] border border-[#DDD9D2] rounded-xl px-3 py-2 text-sm text-[#6B6560] font-body outline-none focus:border-[#B08C1E]/40 resize-none placeholder:text-[#C4BEB8] transition-colors"
+              className={`w-full bg-[#F5F3EE] border border-[#DDD9D2] rounded-xl px-3 py-2 text-sm text-[#6B6560] font-body outline-none resize-none placeholder:text-[#C4BEB8] transition-colors ${isAdmin ? 'focus:border-[#B08C1E]/40' : 'cursor-default'}`}
             />
           </div>
 
@@ -215,15 +230,17 @@ export default function AssociateProfile({ id, onClose, onAward }: Props) {
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="px-5 py-4 border-t border-[#E8E4DF]">
-          <button
-            onClick={() => { onClose(); onAward(id); }}
-            className="w-full py-3 bg-[#1C1917] text-white font-heading text-base rounded-xl hover:bg-[#2C2420] transition-colors active:scale-[0.98]"
-          >
-            + AWARD POINTS
-          </button>
-        </div>
+        {/* Footer — admin only */}
+        {isAdmin && (
+          <div className="px-5 py-4 border-t border-[#E8E4DF]">
+            <button
+              onClick={() => { onClose(); onAward(id); }}
+              className="w-full py-3 bg-[#1C1917] text-white font-heading text-base rounded-xl hover:bg-[#2C2420] transition-colors active:scale-[0.98]"
+            >
+              + AWARD POINTS
+            </button>
+          </div>
+        )}
       </motion.div>
     </motion.div>
   );

@@ -12,12 +12,13 @@ interface Props {
   onCardClick: (id: string) => void;
   onAwardClick: (id: string) => void;
   isTied?: boolean;
+  isAdmin?: boolean;
 }
 
 const MEDAL = ['🥇', '🥈', '🥉'];
 
 const LeaderboardCard = forwardRef<HTMLDivElement, Props>(function LeaderboardCard(
-  { associate: a, rank, onCardClick, onAwardClick, isTied }, ref
+  { associate: a, rank, onCardClick, onAwardClick, isTied, isAdmin = true }, ref
 ) {
   const isTop3 = rank <= 3;
   const isFirst = rank === 1;
@@ -81,15 +82,15 @@ const LeaderboardCard = forwardRef<HTMLDivElement, Props>(function LeaderboardCa
         )}
       </div>
 
-      {/* Award button */}
-      <button
+      {/* Award button — admin only */}
+      {isAdmin && <button
         onClick={(e) => { e.stopPropagation(); onAwardClick(a.id); }}
         className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-lg
           text-[#C4BEB8] hover:text-[#1C1917] hover:bg-[#F5F3EE] transition-colors text-sm font-heading"
         title="Award points"
       >
         +
-      </button>
+      </button>}
     </motion.div>
   );
 });

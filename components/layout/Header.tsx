@@ -9,9 +9,10 @@ import QuoteBanner from '@/components/ui/QuoteBanner';
 interface Props {
   onEndShift: () => void;
   onCrownPOTD: () => void;
+  isAdmin: boolean;
 }
 
-export default function Header({ onEndShift, onCrownPOTD }: Props) {
+export default function Header({ onEndShift, onCrownPOTD, isAdmin }: Props) {
   const { state, dispatch } = useAppState();
   const { shift, settings } = state;
   const [showStartModal, setShowStartModal] = useState(false);
@@ -30,6 +31,12 @@ export default function Header({ onEndShift, onCrownPOTD }: Props) {
 
   return (
     <>
+      {/* Crew viewer banner */}
+      {!isAdmin && (
+        <div className="w-full bg-[#B08C1E] text-white text-[11px] font-body text-center py-1 tracking-widest select-none">
+          👀 Viewer Mode — Behemoth Crew
+        </div>
+      )}
       <header className="bg-white border-b border-[#DDD9D2] px-4 py-2.5">
         <div className="flex items-center gap-3 max-w-screen-xl mx-auto">
 
@@ -79,7 +86,7 @@ export default function Header({ onEndShift, onCrownPOTD }: Props) {
               {settings.soundEnabled ? '🔊' : '🔇'}
             </button>
 
-            {shift.active && (
+            {isAdmin && shift.active && (
               <button
                 onClick={hasPOTD ? undefined : onCrownPOTD}
                 className={`
@@ -94,20 +101,22 @@ export default function Header({ onEndShift, onCrownPOTD }: Props) {
               </button>
             )}
 
-            {shift.active ? (
-              <button
-                onClick={onEndShift}
-                className="px-3 py-1.5 bg-[#FEF2F2] hover:bg-[#FEE2E2] border border-[#FECACA] text-[#B91C1C] text-xs font-heading rounded-lg transition-colors"
-              >
-                END SHIFT
-              </button>
-            ) : (
-              <button
-                onClick={() => setShowStartModal(true)}
-                className="px-3 py-1.5 bg-[#1C1917] hover:bg-[#2C2420] text-white text-xs font-heading rounded-lg transition-colors"
-              >
-                START SHIFT
-              </button>
+            {isAdmin && (
+              shift.active ? (
+                <button
+                  onClick={onEndShift}
+                  className="px-3 py-1.5 bg-[#FEF2F2] hover:bg-[#FEE2E2] border border-[#FECACA] text-[#B91C1C] text-xs font-heading rounded-lg transition-colors"
+                >
+                  END SHIFT
+                </button>
+              ) : (
+                <button
+                  onClick={() => setShowStartModal(true)}
+                  className="px-3 py-1.5 bg-[#1C1917] hover:bg-[#2C2420] text-white text-xs font-heading rounded-lg transition-colors"
+                >
+                  START SHIFT
+                </button>
+              )
             )}
           </div>
         </div>

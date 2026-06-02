@@ -16,6 +16,7 @@ interface Props {
   multiSelectMode?: boolean;
   isSelected?: boolean;
   onToggleSelect?: (id: string) => void;
+  isAdmin?: boolean;
 }
 
 const ACCENT: Record<string, string> = {
@@ -27,7 +28,7 @@ const ACCENT: Record<string, string> = {
   legend:  'accent-legend',
 };
 
-export default function AssociateCard({ associate: a, onCardClick, onAwardClick, multiSelectMode, isSelected, onToggleSelect }: Props) {
+export default function AssociateCard({ associate: a, onCardClick, onAwardClick, multiSelectMode, isSelected, onToggleSelect, isAdmin = true }: Props) {
   const { state } = useAppState();
   const [hovered, setHovered] = useState(false);
 
@@ -108,7 +109,7 @@ export default function AssociateCard({ associate: a, onCardClick, onAwardClick,
 
       {/* Hover award button (normal mode only) */}
       <AnimatePresence>
-        {hovered && !multiSelectMode && (
+        {hovered && !multiSelectMode && isAdmin && (
           <motion.button
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}

@@ -1,11 +1,11 @@
 'use client';
 
-import { createContext, useContext, useReducer, useEffect, useState } from 'react';
+import { createContext, useContext, useReducer, useEffect, useState, useRef } from 'react';
 import type { AppState, Associate, AwardEvent, ReasonTag, AppSettings } from '../types';
 import { INITIAL_STATE, uuid } from '../constants';
-import { loadState, saveState } from '../storage';
 import { getTier, isTierHigher } from '../utils/tiers';
 import { calculateNewStreak, toDateKey, recalculateStreak } from '../utils/dates';
+import { fetchStateFromSupabase, syncToSupabase, setupRealtimeSubscription } from '../db';
 
 export type { AppState };
 
@@ -64,7 +64,6 @@ function appReducer(state: AppState, action: Action): AppState {
         };
       });
 
-      // detect tier upgrade for celebration
       const upgraded = associates.find(a => a.id === action.associateId);
       const original = state.associates.find(a => a.id === action.associateId);
       const pendingCelebration =
@@ -260,7 +259,6 @@ function appReducer(state: AppState, action: Action): AppState {
     }
 
     case 'IMPORT_STATE': {
-      // Recalculate streaks on import (might have been away for days)
       const associates = action.state.associates.map(a => ({
         ...a,
         streak: recalculateStreak(a.streak, a.lastPointDate),
@@ -288,6 +286,8 @@ function appReducer(state: AppState, action: Action): AppState {
 interface AppContextValue {
   state: AppState;
   dispatch: React.Dispatch<Action>;
+  isLoading: boolean;
+  dbError: string | null;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -295,19 +295,43 @@ const AppContext = createContext<AppContextValue | null>(null);
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(appReducer, INITIAL_STATE);
   const [hydrated, setHydrated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [dbError, setDbError] = useState<string | null>(null);
+  const syncedEventIdsRef = useRef<Set<string>>(new Set());
+  const syncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Load from Supabase on mount + setup realtime subscription
   useEffect(() => {
-    const saved = loadState();
-    if (saved) dispatch({ type: 'IMPORT_STATE', state: saved });
-    setHydrated(true);
+    setIsLoading(true);
+    fetchStateFromSupabase()
+      .then(s => {
+        if (s) {
+          dispatch({ type: 'IMPORT_STATE', state: s });
+          // Pre-populate synced IDs to avoid re-inserting existing events on first sync
+          for (const a of s.associates)
+            for (const ev of a.awardHistory)
+              syncedEventIdsRef.current.add(ev.id);
+        }
+      })
+      .catch(e => setDbError(e.message))
+      .finally(() => { setIsLoading(false); setHydrated(true); });
+
+    const unsub = setupRealtimeSubscription(dispatch);
+    return () => unsub();
   }, []);
 
+  // Debounced sync to Supabase after every state change
   useEffect(() => {
-    if (hydrated) saveState(state);
+    if (!hydrated) return;
+    if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
+    syncTimerRef.current = setTimeout(() => {
+      syncToSupabase(state, syncedEventIdsRef).catch(console.error);
+    }, 500);
+    return () => { if (syncTimerRef.current) clearTimeout(syncTimerRef.current); };
   }, [state, hydrated]);
 
   return (
-    <AppContext.Provider value={{ state, dispatch }}>
+    <AppContext.Provider value={{ state, dispatch, isLoading, dbError }}>
       {children}
     </AppContext.Provider>
   );

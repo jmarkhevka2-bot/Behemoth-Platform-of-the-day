@@ -4,7 +4,6 @@ import { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppState } from '@/lib/hooks/useAppState';
 import AssociateCard from '@/components/ui/AssociateCard';
-import type { Associate } from '@/lib/types';
 
 type SortKey = 'name' | 'season' | 'daily' | 'streak';
 
@@ -12,9 +11,10 @@ interface Props {
   onCardClick: (id: string) => void;
   onAwardClick: (id: string) => void;
   onBulkAward: (ids: string[]) => void;
+  isAdmin: boolean;
 }
 
-export default function CrewGrid({ onCardClick, onAwardClick, onBulkAward }: Props) {
+export default function CrewGrid({ onCardClick, onAwardClick, onBulkAward, isAdmin }: Props) {
   const { state } = useAppState();
   const [search, setSearch]           = useState('');
   const [sort, setSort]               = useState<SortKey>('name');
@@ -100,8 +100,8 @@ export default function CrewGrid({ onCardClick, onAwardClick, onBulkAward }: Pro
             </button>
           ))}
 
-          {/* Multi-select toggle */}
-          <button
+          {/* Multi-select toggle — admin only */}
+          {isAdmin && <button
             onClick={() => {
               if (multiSelectMode) exitMultiSelect();
               else setMultiSelectMode(true);
@@ -114,7 +114,7 @@ export default function CrewGrid({ onCardClick, onAwardClick, onBulkAward }: Pro
             title="Multi-select for bulk award"
           >
             ☑
-          </button>
+          </button>}
         </div>
       </div>
 
@@ -165,6 +165,7 @@ export default function CrewGrid({ onCardClick, onAwardClick, onBulkAward }: Pro
                 multiSelectMode={multiSelectMode}
                 isSelected={selectedIds.has(a.id)}
                 onToggleSelect={handleToggleSelect}
+                isAdmin={isAdmin}
               />
             </motion.div>
           ))}

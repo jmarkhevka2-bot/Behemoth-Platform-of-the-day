@@ -20,7 +20,11 @@ import TierCelebration from './modals/TierCelebration';
 import POTDCeremony from './modals/POTDCeremony';
 import EndShiftSummary from './modals/EndShiftSummary';
 
-export default function Dashboard() {
+interface Props {
+  isAdmin: boolean;
+}
+
+export default function Dashboard({ isAdmin }: Props) {
   const { state, dispatch } = useAppState();
   const [activeView, setActiveView]       = useState<ViewKey>('leaderboard');
   const [profileId, setProfileId]         = useState<string | null>(null);
@@ -88,6 +92,7 @@ export default function Dashboard() {
       <Leaderboard
         onCardClick={handleOpenProfile}
         onAwardClick={handleOpenAward}
+        isAdmin={isAdmin}
       />
     ),
     crew: (
@@ -95,19 +100,20 @@ export default function Dashboard() {
         onCardClick={handleOpenProfile}
         onAwardClick={handleOpenAward}
         onBulkAward={handleBulkAward}
+        isAdmin={isAdmin}
       />
     ),
     halloffame: <HallOfFame />,
-    settings: <Settings />,
-  }), [handleOpenProfile, handleOpenAward, handleBulkAward]);
+    settings:   <Settings />,
+  }), [handleOpenProfile, handleOpenAward, handleBulkAward, isAdmin]);
 
   const hasPendingCelebration = !!state.pendingCelebration;
 
   return (
     <div className="relative h-screen w-screen flex flex-col overflow-hidden bg-[#F5F3EE]">
       <div className="flex flex-col h-full">
-        <Header onEndShift={handleEndShift} onCrownPOTD={() => setShowPOTD(true)} />
-        <Navigation active={activeView} onChange={setActiveView} />
+        <Header onEndShift={handleEndShift} onCrownPOTD={() => setShowPOTD(true)} isAdmin={isAdmin} />
+        <Navigation active={activeView} onChange={setActiveView} isAdmin={isAdmin} />
 
         <main className="flex-1 overflow-hidden relative">
           <AnimatePresence mode="wait">
@@ -133,6 +139,7 @@ export default function Dashboard() {
             id={profileId}
             onClose={() => setProfileId(null)}
             onAward={(id) => { setProfileId(null); setAwardTargetId(id); }}
+            isAdmin={isAdmin}
           />
         )}
       </AnimatePresence>

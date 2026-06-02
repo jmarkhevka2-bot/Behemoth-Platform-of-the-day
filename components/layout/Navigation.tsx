@@ -14,12 +14,14 @@ const TABS: Array<{ key: ViewKey; label: string; icon: string }> = [
 interface Props {
   active: ViewKey;
   onChange: (key: ViewKey) => void;
+  isAdmin: boolean;
 }
 
-export default function Navigation({ active, onChange }: Props) {
+export default function Navigation({ active, onChange, isAdmin }: Props) {
+  const visibleTabs = isAdmin ? TABS : TABS.filter(t => t.key !== 'settings');
   return (
     <nav className="relative flex border-b border-[#DDD9D2] bg-white">
-      {TABS.map(tab => (
+      {visibleTabs.map(tab => (
         <button
           key={tab.key}
           onClick={() => onChange(tab.key)}

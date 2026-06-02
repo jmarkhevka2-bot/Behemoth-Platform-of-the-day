@@ -16,6 +16,9 @@ const inter = Inter({
   display: 'swap',
 });
 
+// Disable static pre-rendering — this app requires Supabase env vars at runtime
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Behemoth — Platform of the Day',
   description: 'Crew recognition dashboard for Behemoth ride operations.',
