@@ -27,81 +27,105 @@ export type BadgeKey =
   | 'rising_star';
 
 export interface BadgeEntry {
-  key: BadgeKey;
-  unlockedAt: string; // ISO timestamp
+  key:         BadgeKey;
+  unlockedAt:  string;
 }
 
 export interface AwardEvent {
-  id: string;
+  id:         string;
   associateId: string;
-  reason: string;
-  reasonTag: ReasonTag | 'custom';
-  points: number;
-  note?: string;
-  timestamp: string;
-  shiftId: string;
+  reason:     string;
+  reasonTag:  ReasonTag | 'custom';
+  points:     number;
+  note?:      string;
+  timestamp:  string;
+  shiftId:    string;
 }
 
 export interface Associate {
-  id: string;
-  lastName: string;
-  firstName: string;
-  displayName: string;
-  emoji: string;
-  seasonPoints: number;
-  dailyPoints: number;
-  potdWins: number;
-  streak: number;
+  id:            string;
+  lastName:      string;
+  firstName:     string;
+  displayName:   string;
+  emoji:         string;
+  seasonPoints:  number;
+  dailyPoints:   number;
+  potdWins:      number;
+  streak:        number;
   lastPointDate: string | null;
-  currentTier: Tier;
+  currentTier:   Tier;
   tiersUnlocked: Tier[];
-  notes: string;
-  awardHistory: AwardEvent[];
-  badges: BadgeEntry[];
+  notes:         string;
+  awardHistory:  AwardEvent[];
+  badges:        BadgeEntry[];
 }
 
 export interface ShiftState {
-  id: string;
-  active: boolean;
-  startTime: string | null;
-  target: string;
+  id:             string;
+  active:         boolean;
+  startTime:      string | null;
+  target:         string;
   dailyChallenge: string;
-  date: string;
+  date:           string;
 }
 
 export interface TierConfig {
-  tier: Tier;
-  label: string;
-  emoji: string;
+  tier:      Tier;
+  label:     string;
+  emoji:     string;
   threshold: number;
-  reward: string;
-  color: string;
+  reward:    string;
+  color:     string;
+}
+
+export interface ShiftOverride {
+  date:    string; // YYYY-MM-DD — only applies on this exact date
+  startHH: number;
+  startMM: number;
+  endHH:   number;
+  endMM:   number;
 }
 
 export interface AppSettings {
-  soundEnabled: boolean;
-  darkMode: boolean;
-  dispatchTarget: string;
-  pointValues: Record<ReasonTag, number>;
-  tiers: TierConfig[];
+  soundEnabled:    boolean;
+  darkMode:        boolean;
+  dispatchTarget:  string;
+  pointValues:     Record<ReasonTag, number>;
+  tiers:           TierConfig[];
+  shiftOverride:   ShiftOverride | null;
+}
+
+export interface RivalResult {
+  id1:      string;
+  id2:      string;
+  name1:    string;
+  name2:    string;
+  emoji1:   string;
+  emoji2:   string;
+  pts1:     number; // daily points earned this shift
+  pts2:     number;
+  winnerId: string | null; // null = tied
+  tied:     boolean;
 }
 
 export interface EndShiftData {
-  awards: AwardEvent[];
+  awards:             AwardEvent[];
   potdWinnerSnapshot: Associate | null;
-  totalPointsGiven: number;
-  shiftDuration: number;
-  date: string;
+  totalPointsGiven:   number;
+  shiftDuration:      number;
+  date:               string;
+  rivalResult:        RivalResult | null;
 }
 
 export interface AppState {
-  associates: Associate[];
-  shift: ShiftState;
-  settings: AppSettings;
-  potdWinner: string | null;
-  pendingCelebration: { associateId: string; newTier: Tier } | null;
-  pendingPOTD: boolean;
-  lastEndShiftData: EndShiftData | null;
-  lastAward: { event: AwardEvent; associateId: string } | null;
+  associates:          Associate[];
+  shift:               ShiftState;
+  settings:            AppSettings;
+  potdWinner:          string | null;
+  dailyRival:          { id1: string; id2: string } | null;
+  pendingCelebration:  { associateId: string; newTier: Tier } | null;
+  pendingPOTD:         boolean;
+  lastEndShiftData:    EndShiftData | null;
+  lastAward:           { event: AwardEvent; associateId: string } | null;
   pendingBadgeUnlocks: Array<{ associateId: string; badge: BadgeKey }>;
 }

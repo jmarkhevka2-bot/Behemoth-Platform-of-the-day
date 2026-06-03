@@ -27,7 +27,7 @@ export default function ShiftTimer({ startTime }: Props) {
   const formatted = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 
   return (
-    <span className="font-mono text-accent-blue text-sm tabular-nums tracking-widest">
+    <span className="font-mono text-[var(--accent-blue)] text-sm tabular-nums tracking-widest">
       ⏱ {formatted}
     </span>
   );

@@ -33,6 +33,27 @@ export default function AwardPanel({ targetId, onClose }: Props) {
 
   if (!associate) return null;
 
+  // Block awards outside shift hours
+  if (!state.shift.active) {
+    return (
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className="fixed inset-0 z-40 modal-backdrop flex items-end sm:items-center justify-center p-0 sm:p-4"
+        onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+        <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 40, opacity: 0 }}
+          transition={{ type: 'spring', stiffness: 350, damping: 32 }}
+          className="w-full sm:max-w-md bg-[var(--bg-card)] border border-[var(--border)] rounded-t-2xl sm:rounded-2xl p-5 shadow-2xl text-center">
+          <p className="text-3xl mb-3">⏰</p>
+          <p className="font-heading text-[var(--text-primary)] text-lg mb-1">Shift Not Active</p>
+          <p className="text-[var(--text-muted)] font-body text-sm mb-4">Awards are only available between 10:00 AM and 10:00 PM ET.</p>
+          <button onClick={onClose}
+            className="px-6 py-2.5 bg-[#1C1917] text-white font-heading text-sm rounded-xl hover:bg-[#2C2420] transition-colors">
+            Got it
+          </button>
+        </motion.div>
+      </motion.div>
+    );
+  }
+
   const ptValue   = selectedTag === 'custom' ? customPts : selectedTag ? (state.settings.pointValues[selectedTag] ?? 1) : 0;
   const newTotal  = associate.seasonPoints + ptValue;
   const newTier   = selectedTag ? getTier(newTotal, state.settings.tiers) : associate.currentTier;

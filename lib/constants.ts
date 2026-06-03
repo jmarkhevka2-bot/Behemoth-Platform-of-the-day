@@ -129,11 +129,12 @@ export const MOTIVATIONAL_QUOTES = [
 ];
 
 export const DEFAULT_SETTINGS: AppSettings = {
-  soundEnabled: true,
-  darkMode: true,
+  soundEnabled:   true,
+  darkMode:       true,
   dispatchTarget: '33 cycles/hr 🚀',
-  pointValues: DEFAULT_POINT_VALUES as AppSettings['pointValues'],
-  tiers: DEFAULT_TIER_CONFIGS,
+  pointValues:    DEFAULT_POINT_VALUES as AppSettings['pointValues'],
+  tiers:          DEFAULT_TIER_CONFIGS,
+  shiftOverride:  null,
 };
 
 export const INITIAL_SHIFT = {
@@ -146,13 +147,14 @@ export const INITIAL_SHIFT = {
 };
 
 export const INITIAL_STATE: AppState = {
-  associates: INITIAL_ASSOCIATES,
-  shift: INITIAL_SHIFT,
-  settings: DEFAULT_SETTINGS,
-  potdWinner: null,
+  associates:         INITIAL_ASSOCIATES,
+  shift:              INITIAL_SHIFT,
+  settings:           DEFAULT_SETTINGS,
+  potdWinner:         null,
+  dailyRival:         null,
   pendingCelebration: null,
-  pendingPOTD: false,
-  lastEndShiftData: null,
-  lastAward: null,
+  pendingPOTD:        false,
+  lastEndShiftData:   null,
+  lastAward:          null,
   pendingBadgeUnlocks: [],
 };

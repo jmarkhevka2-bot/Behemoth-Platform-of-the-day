@@ -7,6 +7,7 @@ import { getTier, isTierHigher } from '../utils/tiers';
 import { calculateNewStreak, toDateKey, recalculateStreak } from '../utils/dates';
 import { checkNewBadges, makeBadgeEntries } from '../utils/badges';
 import { fetchStateFromSupabase, syncToSupabase, setupRealtimeSubscription } from '../db';
+import type { ShiftOverride } from '../types';
 
 export type { AppState };
 
@@ -29,7 +30,10 @@ export type Action =
   | { type: 'CLEAR_PENDING_CELEBRATION' }
   | { type: 'SHIFT_BADGE_UNLOCK' }
   | { type: 'SET_SHIFT_TARGET'; target: string }
-  | { type: 'SET_DAILY_CHALLENGE'; challenge: string };
+  | { type: 'SET_DAILY_CHALLENGE'; challenge: string }
+  | { type: 'AUTO_START_SHIFT'; date: string; rival: { id1: string; id2: string } | null }
+  | { type: 'AUTO_END_SHIFT' }
+  | { type: 'SET_SHIFT_OVERRIDE'; override: ShiftOverride | null };
 
 function appReducer(state: AppState, action: Action): AppState {
   switch (action.type) {
@@ -150,7 +154,7 @@ function appReducer(state: AppState, action: Action): AppState {
         ...state,
         shift: { ...state.shift, active: false },
         pendingPOTD: false,
-        lastEndShiftData: { awards: allAwards, potdWinnerSnapshot: potdAssoc, totalPointsGiven: totalPoints, shiftDuration: duration, date: state.shift.date },
+        lastEndShiftData: { awards: allAwards, potdWinnerSnapshot: potdAssoc, totalPointsGiven: totalPoints, shiftDuration: duration, date: state.shift.date, rivalResult: null },
       };
     }
 
@@ -276,7 +280,16 @@ function appReducer(state: AppState, action: Action): AppState {
         streak:  recalculateStreak(a.streak, a.lastPointDate),
         badges:  a.badges ?? [],
       }));
-      return { ...action.state, associates, pendingBadgeUnlocks: action.state.pendingBadgeUnlocks ?? [] };
+      return {
+        ...action.state,
+        associates,
+        dailyRival:          action.state.dailyRival          ?? null,
+        pendingBadgeUnlocks: action.state.pendingBadgeUnlocks ?? [],
+        settings: {
+          ...action.state.settings,
+          shiftOverride: action.state.settings.shiftOverride ?? null,
+        },
+      };
     }
 
     case 'CLEAR_PENDING_CELEBRATION':
@@ -287,6 +300,92 @@ function appReducer(state: AppState, action: Action): AppState {
 
     case 'SET_DAILY_CHALLENGE':
       return { ...state, shift: { ...state.shift, dailyChallenge: action.challenge } };
+
+    case 'AUTO_START_SHIFT': {
+      // Reset daily points; start a fresh shift for today; record rivals
+      const associates = state.associates.map(a => ({ ...a, dailyPoints: 0 }));
+      return {
+        ...state,
+        associates,
+        potdWinner:  null,
+        dailyRival:  action.rival,
+        shift: {
+          ...state.shift,
+          id:             uuid(),
+          active:         true,
+          startTime:      new Date().toISOString(),
+          date:           action.date,
+          dailyChallenge: '',
+        },
+      };
+    }
+
+    case 'AUTO_END_SHIFT': {
+      const { dailyRival: rival } = state;
+      let associates = [...state.associates];
+      let rivalResult = null;
+
+      if (rival) {
+        const a1 = associates.find(a => a.id === rival.id1);
+        const a2 = associates.find(a => a.id === rival.id2);
+        if (a1 && a2) {
+          const pts1 = a1.dailyPoints;
+          const pts2 = a2.dailyPoints;
+          const tied = pts1 === pts2;
+          const winnerId = tied ? null : (pts1 > pts2 ? rival.id1 : rival.id2);
+          rivalResult = { id1: rival.id1, id2: rival.id2, name1: a1.displayName, name2: a2.displayName, emoji1: a1.emoji, emoji2: a2.emoji, pts1, pts2, winnerId, tied };
+
+          // Award rivalry bonus points
+          const bonuses: Array<{ id: string; pts: number; label: string }> = tied
+            ? [{ id: rival.id1, pts: 2, label: 'Rivalry Tie Bonus' }, { id: rival.id2, pts: 2, label: 'Rivalry Tie Bonus' }]
+            : winnerId ? [{ id: winnerId, pts: 3, label: 'Rivalry Victory' }] : [];
+
+          associates = associates.map(a => {
+            const bonus = bonuses.find(b => b.id === a.id);
+            if (!bonus) return a;
+            const bonusEvent: AwardEvent = {
+              id: uuid(), associateId: a.id, reason: bonus.label, reasonTag: 'above_beyond',
+              points: bonus.pts, timestamp: new Date().toISOString(), shiftId: state.shift.id,
+            };
+            const newSeasonPoints = a.seasonPoints + bonus.pts;
+            const newTier = getTier(newSeasonPoints, state.settings.tiers);
+            return {
+              ...a,
+              seasonPoints: newSeasonPoints,
+              dailyPoints:  a.dailyPoints + bonus.pts,
+              currentTier:  newTier,
+              tiersUnlocked: isTierHigher(newTier, a.currentTier) && !a.tiersUnlocked.includes(newTier)
+                ? [...a.tiersUnlocked, newTier] : a.tiersUnlocked,
+              awardHistory: [bonusEvent, ...a.awardHistory].slice(0, 50),
+            };
+          });
+        }
+      }
+
+      const allAwards = associates.flatMap(a => a.awardHistory.filter(e => e.shiftId === state.shift.id));
+      const potdAssoc = state.potdWinner ? (associates.find(a => a.id === state.potdWinner) ?? null) : null;
+      const duration  = state.shift.startTime
+        ? Math.floor((Date.now() - new Date(state.shift.startTime).getTime()) / 1000) : 0;
+
+      return {
+        ...state,
+        associates,
+        shift:       { ...state.shift, active: false },
+        pendingPOTD: false,
+        dailyRival:  null,
+        lastEndShiftData: {
+          awards: allAwards,
+          potdWinnerSnapshot: potdAssoc,
+          totalPointsGiven: allAwards.reduce((s, e) => s + Math.max(0, e.points), 0),
+          shiftDuration: duration,
+          date: state.shift.date,
+          rivalResult,
+        },
+      };
+    }
+
+    case 'SET_SHIFT_OVERRIDE':
+      return { ...state, settings: { ...state.settings, shiftOverride: action.override } };
 
     default:
       return state;

@@ -78,7 +78,7 @@ export default function CrewGrid({ onCardClick, onAwardClick, onBulkAward, isAdm
               {opt.label}
             </button>
           ))}
-          {isAdmin && (
+          {isAdmin && state.shift.active && (
             <button
               onClick={() => { if (multiSelectMode) exitMultiSelect(); else setMultiSelectMode(true); }}
               className={`px-2 py-1.5 rounded-lg text-xs font-body transition-colors border ${

@@ -95,9 +95,11 @@ export async function fetchStateFromSupabase(): Promise<AppState | null> {
       darkMode:       DEFAULT_SETTINGS.darkMode,
       dispatchTarget: settingsRow?.daily_target   ?? DEFAULT_SETTINGS.dispatchTarget,
       pointValues,
-      tiers: tierConfigs,
+      tiers:         tierConfigs,
+      shiftOverride: settingsRow?.shift_override ?? null,
     },
     potdWinner:          potdRows?.[0]?.associate_id ?? null,
+    dailyRival:          settingsRow?.daily_rival    ?? null,
     pendingCelebration:  null,
     pendingPOTD:         false,
     lastEndShiftData:    null,
@@ -141,6 +143,8 @@ export async function syncToSupabase(
     point_values:     state.settings.pointValues,
     tier_thresholds:  state.settings.tiers,
     potd_winner_id:   state.potdWinner ?? null,
+    daily_rival:      state.dailyRival ?? null,
+    shift_override:   state.settings.shiftOverride ?? null,
   };
 
   // 3. Find new award events not yet synced

@@ -2,26 +2,27 @@
 
 import { motion } from 'framer-motion';
 
-export type ViewKey = 'leaderboard' | 'crew' | 'halloffame' | 'settings';
+export type ViewKey = 'leaderboard' | 'crew' | 'halloffame' | 'settings' | 'info';
 
-const TABS: Array<{ key: ViewKey; label: string; icon: string }> = [
+const TABS: Array<{ key: ViewKey; label: string; icon: string; adminOnly?: boolean }> = [
   { key: 'leaderboard', label: 'Leaderboard', icon: '🏅' },
   { key: 'crew',        label: 'Crew',         icon: '👥' },
   { key: 'halloffame',  label: 'Hall of Fame',  icon: '🏛️' },
-  { key: 'settings',    label: 'Settings',      icon: '⚙️' },
+  { key: 'settings',    label: 'Settings',      icon: '⚙️', adminOnly: true },
+  { key: 'info',        label: 'Info',          icon: 'ℹ️', adminOnly: true },
 ];
 
 interface Props {
-  active: ViewKey;
+  active:   ViewKey;
   onChange: (key: ViewKey) => void;
-  isAdmin: boolean;
+  isAdmin:  boolean;
 }
 
 export default function Navigation({ active, onChange, isAdmin }: Props) {
-  const visibleTabs = isAdmin ? TABS : TABS.filter(t => t.key !== 'settings');
+  const visible = TABS.filter(t => !t.adminOnly || isAdmin);
   return (
     <nav className="relative flex border-b border-[var(--border)] bg-[var(--bg-card)]">
-      {visibleTabs.map(tab => (
+      {visible.map(tab => (
         <button
           key={tab.key}
           onClick={() => onChange(tab.key)}
