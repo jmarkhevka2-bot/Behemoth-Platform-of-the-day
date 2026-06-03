@@ -223,7 +223,7 @@ function ChasingCard({
       )}
 
       <div className="flex items-center gap-3 pt-1">
-        <span className="text-4xl leading-none flex-shrink-0">{associate.emoji}</span>
+        <span className="text-4xl leading-none flex-shrink-0 w-12 text-center">{associate.emoji}</span>
 
         <div className="flex-1 min-w-0">
           <p className="font-body font-semibold text-[var(--text-primary)] text-sm truncate">
@@ -237,7 +237,7 @@ function ChasingCard({
           </div>
         </div>
 
-        <div className="flex-shrink-0 text-right">
+        <div className="flex-shrink-0 text-right min-w-max">
           <PointCounter
             value={associate.seasonPoints}
             className="font-heading text-lg text-[var(--text-primary)] leading-none"
@@ -287,21 +287,21 @@ function PackRow({
       onHoverEnd={() => setHovered(false)}
       onClick={() => onCardClick(associate.id)}
       className={`flex items-center gap-3 px-3 py-2.5 cursor-pointer transition-all border-b border-l-[2px] ${
-        rowIndex % 2 === 0 ? 'bg-[#111111]' : 'bg-[#141414]'
-      } ${hovered ? 'bg-[#1E1E1E]' : ''}`}
+        rowIndex % 2 === 0 ? 'bg-[var(--bg-card)]' : 'bg-[var(--bg-secondary)]'
+      } ${hovered ? 'bg-[var(--bg-card-hover)]' : ''}`}
       style={{
         borderLeftColor: hovered
           ? TIER_COLORS[associate.currentTier]
           : `${TIER_COLORS[associate.currentTier]}40`,
       }}
     >
-      <span className="text-sm font-heading font-bold text-[var(--text-muted)] w-8 flex-shrink-0">
+      <span className="text-sm font-heading font-bold text-[var(--text-muted)] w-7 flex-shrink-0 text-right">
         #{rank}
       </span>
 
-      <span className="text-2xl leading-none flex-shrink-0">{associate.emoji}</span>
+      <span className="text-2xl leading-none flex-shrink-0 w-10 text-center">{associate.emoji}</span>
 
-      <span className="text-sm font-body font-medium text-[var(--text-primary)] flex-1 truncate">
+      <span className="text-sm font-body font-medium text-[var(--text-primary)] flex-1 min-w-0 truncate">
         {associate.displayName}
       </span>
 
@@ -343,7 +343,7 @@ function StatCard({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-4 rounded-xl bg-[#1A1A1A] border border-[var(--border-subtle)] text-center"
+      className="p-4 rounded-xl bg-[var(--bg-card)] border border-[var(--border)] text-center"
     >
       <div className="text-2xl leading-none mb-2">{icon}</div>
       <PointCounter
