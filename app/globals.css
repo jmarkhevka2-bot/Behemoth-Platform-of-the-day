@@ -157,6 +157,22 @@ body {
   -webkit-backdrop-filter: blur(8px);
 }
 
+/* ── Leaderboard: #1 podium outer glow ───────────────────── */
+@keyframes podium-one-pulse {
+  0%, 100% { box-shadow: 0 0 18px rgba(255,215,0,0.40), 0 0 50px rgba(255,215,0,0.12); }
+  50%       { box-shadow: 0 0 32px rgba(255,215,0,0.65), 0 0 85px rgba(255,215,0,0.22); }
+}
+.podium-one-glow { animation: podium-one-pulse 2.6s ease-in-out infinite; }
+
+/* ── Leaderboard: metallic sheen sweep ───────────────────── */
+@keyframes metallic-sheen {
+  0%   { left: -100%; }
+  100% { left: 200%; }
+}
+.metallic-shine::after {
+  animation: metallic-sheen 3s ease-in-out infinite;
+}
+
 /* ── Multi-POTD gold pulse for selected cards ─────────────── */
 .potd-selected-glow {
   box-shadow: 0 0 0 2px #C9A840, 0 0 12px rgba(201,168,64,0.3);
