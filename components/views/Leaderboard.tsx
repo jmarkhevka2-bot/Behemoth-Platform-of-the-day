@@ -105,7 +105,7 @@ function PodiumCard({
 
         <div className="text-6xl leading-none mb-2">{associate.emoji}</div>
 
-        <p className="font-heading text-2xl font-bold text-white mb-1">
+        <p className="font-heading text-2xl font-bold text-[var(--text-primary)] mb-1">
           {associate.displayName}
         </p>
 
@@ -116,23 +116,23 @@ function PodiumCard({
         <div className="text-center mb-4">
           <PointCounter
             value={associate.seasonPoints}
-            className="font-heading text-5xl font-bold text-white leading-tight"
+            className="font-heading text-5xl font-bold text-[var(--text-primary)] leading-tight"
           />
-          <p className="text-xs font-body text-white/70 mt-1">season pts</p>
+          <p className="text-xs font-body text-[var(--text-muted)] mt-1">season pts</p>
         </div>
 
         <div className="flex items-center justify-center gap-4 mb-3 text-sm">
           {associate.potdWins > 0 && (
-            <span className="font-body text-white/80">🏆 {associate.potdWins}</span>
+            <span className="font-body text-[var(--text-secondary)]">🏆 {associate.potdWins}</span>
           )}
           {associate.streak > 0 && (
-            <span className="font-body text-white/80">🔥 {associate.streak}</span>
+            <span className="font-body text-[var(--text-secondary)]">🔥 {associate.streak}</span>
           )}
         </div>
 
-        <div className="w-full h-1 bg-white/20 rounded-full overflow-hidden">
+        <div className="w-full h-1 bg-[var(--text-primary)]/20 rounded-full overflow-hidden">
           <motion.div
-            className="h-full bg-white/60"
+            className="h-full bg-[var(--text-primary)]/60"
             initial={{ width: 0 }}
             animate={{ width: `${progressPercent}%` }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
@@ -194,7 +194,7 @@ function ChasingCard({
       onClick={() => onCardClick(associate.id)}
       whileHover={{ y: -2 }}
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-      className={`relative cursor-pointer p-4 rounded-xl bg-[#1A1A1A] border border-l-4 transition-all duration-200 ${
+      className={`relative cursor-pointer p-4 rounded-xl bg-[var(--bg-card)] border border-l-4 transition-all duration-200 ${
         hovered ? 'shadow-md' : 'shadow-sm'
       }`}
       style={{
@@ -204,7 +204,7 @@ function ChasingCard({
           : undefined,
       }}
     >
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent rounded-t-xl pointer-events-none" />
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--border)] to-transparent rounded-t-xl pointer-events-none" />
 
       <div className="absolute top-4 left-4 text-lg font-heading font-bold text-[var(--text-primary)]">
         #{rank}
@@ -246,7 +246,7 @@ function ChasingCard({
         </div>
       </div>
 
-      <div className="mt-3 h-0.5 bg-[var(--border-subtle)] rounded-full overflow-hidden">
+      <div className="mt-3 h-0.5 bg-[var(--border)] rounded-full overflow-hidden">
         <motion.div
           className="h-full"
           style={{ backgroundColor: TIER_COLORS[associate.currentTier] }}
