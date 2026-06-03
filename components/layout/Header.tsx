@@ -40,8 +40,8 @@ export default function Header({ onCrownPOTD, isAdmin }: Props) {
         </div>
       )}
 
-      <header className="bg-[var(--bg-card)] border-b border-[var(--border)] px-4 py-2.5">
-        <div className="flex items-center gap-3 max-w-screen-xl mx-auto">
+      <header className="bg-[var(--bg-card)] border-b border-[var(--border)]">
+        <div className="flex items-center gap-3 px-4 py-2.5">
 
           {/* Brand */}
           <div className="flex-shrink-0 flex items-center gap-2.5">

@@ -113,15 +113,15 @@ function PodiumCard({
           <TierBadge tier={associate.currentTier} size="sm" showLabel />
         </div>
 
-        <div className="text-center mb-2">
+        <div className="text-center mb-4">
           <PointCounter
             value={associate.seasonPoints}
-            className="font-heading text-4xl font-bold text-white leading-none"
+            className="font-heading text-5xl font-bold text-white leading-tight"
           />
-          <p className="text-xs font-body text-white/70 mt-0.5">season pts</p>
+          <p className="text-xs font-body text-white/70 mt-1">season pts</p>
         </div>
 
-        <div className="flex items-center justify-center gap-4 mb-4 text-sm">
+        <div className="flex items-center justify-center gap-4 mb-3 text-sm">
           {associate.potdWins > 0 && (
             <span className="font-body text-white/80">🏆 {associate.potdWins}</span>
           )}
@@ -413,7 +413,7 @@ export default function Leaderboard({
       style={{
         background: `
           radial-gradient(ellipse 800px 400px at center top, rgba(255,215,0,0.08) 0%, transparent 70%),
-          #0A0A0A
+          var(--bg-primary)
         `,
       }}
     >
