@@ -21,11 +21,14 @@ interface Props {
 export default function Navigation({ active, onChange, isAdmin }: Props) {
   const visible = TABS.filter(t => !t.adminOnly || isAdmin);
   return (
-    <nav className="relative flex border-b border-[var(--border)] bg-[var(--bg-card)]">
+    <nav className="relative flex border-b border-[var(--border)] bg-[var(--bg-card)]" role="tablist">
       {visible.map(tab => (
         <button
           key={tab.key}
           onClick={() => onChange(tab.key)}
+          role="tab"
+          aria-selected={active === tab.key}
+          aria-label={tab.label}
           className={`
             relative flex-1 flex items-center justify-center gap-1.5
             py-2.5 px-2 text-xs font-body transition-colors select-none

@@ -47,7 +47,20 @@ export default function AssociateCard({
     onCardClick(a.id);
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
   const isPOTDMode = potdSelectMode;
+
+  const ariaLabel = potdSelectMode
+    ? `Select ${a.displayName} for Platform of the Day${isPOTDSelected ? ', selected' : ''}`
+    : multiSelectMode
+      ? `Select ${a.displayName}${isSelected ? ', selected' : ''}`
+      : `${a.displayName}, ${a.seasonPoints} points`;
 
   return (
     <motion.div
@@ -56,6 +69,8 @@ export default function AssociateCard({
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
       onHoverStart={() => setHovered(true)}
       onHoverEnd={() => setHovered(false)}
+      role="button"
+      tabIndex={0}
       className={`
         relative bg-[var(--bg-card)] border border-l-[3px] rounded-xl p-3 cursor-pointer
         select-none border-[var(--border)] ${ACCENT[a.currentTier]}
@@ -66,6 +81,9 @@ export default function AssociateCard({
             : hovered ? 'shadow-md' : 'shadow-sm'}
       `}
       onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      aria-label={ariaLabel}
+      aria-pressed={isSelected || isPOTDSelected}
     >
       {/* Multi-select checkbox */}
       {multiSelectMode && (

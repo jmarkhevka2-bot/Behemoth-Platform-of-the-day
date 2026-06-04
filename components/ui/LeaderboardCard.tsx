@@ -25,12 +25,23 @@ const LeaderboardCard = forwardRef<HTMLDivElement, Props>(function LeaderboardCa
   const isTop3  = rank <= 3;
   const isFirst = rank === 1;
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onCardClick(a.id);
+    }
+  };
+
+  const ariaLabel = `Rank ${rank}: ${a.displayName} with ${a.seasonPoints} points${a.currentTier !== 'none' ? `, tier ${a.currentTier}` : ''}${a.dailyPoints > 0 ? `, ${a.dailyPoints} points today` : ''}`;
+
   return (
     <motion.div
       ref={ref}
       whileHover={{ x: 2 }}
       whileTap={{ scale: 0.99 }}
       transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+      role="button"
+      tabIndex={0}
       className={`
         flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer
         bg-[var(--bg-card)] border border-l-[3px] select-none transition-shadow
@@ -39,6 +50,8 @@ const LeaderboardCard = forwardRef<HTMLDivElement, Props>(function LeaderboardCa
           : 'border-[var(--border)] accent-none hover:shadow-sm'}
       `}
       onClick={() => onCardClick(a.id)}
+      onKeyDown={handleKeyDown}
+      aria-label={ariaLabel}
     >
       {/* Rank */}
       <div className="w-7 flex-shrink-0 text-right">
@@ -93,10 +106,11 @@ const LeaderboardCard = forwardRef<HTMLDivElement, Props>(function LeaderboardCa
             onClick={(e) => { e.stopPropagation(); onAwardClick(a.id); }}
             className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-lg
               text-[var(--text-hint)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-colors text-sm font-heading"
+            aria-label={`Award points to ${a.displayName}`}
             title="Award points"
           >+</button>
         ) : (
-          <span className="flex-shrink-0 w-7 h-7 flex items-center justify-center text-[var(--text-hint)]/30 text-sm font-heading cursor-not-allowed" title="Shift not active">+</span>
+          <span className="flex-shrink-0 w-7 h-7 flex items-center justify-center text-[var(--text-hint)]/30 text-sm font-heading cursor-not-allowed" aria-label="Shift not active" title="Shift not active">+</span>
         )
       )}
     </motion.div>

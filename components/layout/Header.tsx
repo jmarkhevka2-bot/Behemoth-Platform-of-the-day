@@ -88,6 +88,7 @@ export default function Header({ onCrownPOTD, isAdmin }: Props) {
             <button
               onClick={toggleTheme}
               className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] transition-colors text-base"
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
               title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {theme === 'dark' ? '☀️' : '🌙'}
@@ -97,6 +98,7 @@ export default function Header({ onCrownPOTD, isAdmin }: Props) {
             <button
               onClick={() => dispatch({ type: 'UPDATE_SETTINGS', settings: { soundEnabled: !settings.soundEnabled } })}
               className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] transition-colors text-base"
+              aria-label={settings.soundEnabled ? 'Mute sounds' : 'Enable sounds'}
               title={settings.soundEnabled ? 'Mute sounds' : 'Enable sounds'}
             >
               {settings.soundEnabled ? '🔊' : '🔇'}
@@ -106,12 +108,14 @@ export default function Header({ onCrownPOTD, isAdmin }: Props) {
             {isAdmin && shift.active && (
               <button
                 onClick={hasPOTD ? undefined : onCrownPOTD}
+                disabled={hasPOTD}
                 className={`
                   px-3 py-1.5 text-xs font-heading rounded-lg transition-colors border
                   ${hasPOTD
                     ? 'bg-[var(--bg-secondary)] border-[var(--border)] text-[var(--text-hint)] cursor-default'
                     : 'bg-[var(--accent-gold)] border-[var(--accent-gold)] text-white hover:opacity-90'}
                 `}
+                aria-label={hasPOTD ? 'Platform of the Day already crowned' : 'Crown Platform of the Day'}
                 title={hasPOTD ? 'POTD already crowned' : 'Crown Platform of the Day'}
               >
                 {hasPOTD ? '👑 Crowned' : '👑 CROWN POTD'}

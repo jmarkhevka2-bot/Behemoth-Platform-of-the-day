@@ -63,12 +63,23 @@ function PodiumCard({
     ? Math.min(100, (associate.seasonPoints / nextTierConfig.threshold) * 100)
     : 100;
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onCardClick(associate.id);
+    }
+  };
+
   return (
     <motion.div
       layout
       layoutId={`podium-${associate.id}`}
       onClick={() => onCardClick(associate.id)}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
       className={`relative cursor-pointer ${rank === 1 ? 'md:scale-110 md:mb-4' : ''}`}
+      aria-label={`Rank ${rank}: ${associate.displayName} with ${associate.seasonPoints} points`}
     >
       <motion.div
         whileHover={{ y: -4 }}
@@ -179,6 +190,13 @@ function ChasingCard({
     ? Math.min(100, (associate.seasonPoints / nextTierConfig.threshold) * 100)
     : 100;
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onCardClick(associate.id);
+    }
+  };
+
   return (
     <motion.div
       layout
@@ -189,11 +207,15 @@ function ChasingCard({
       onHoverStart={() => setHovered(true)}
       onHoverEnd={() => setHovered(false)}
       onClick={() => onCardClick(associate.id)}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
       whileHover={{ y: -2 }}
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
       className={`relative cursor-pointer p-4 rounded-xl bg-[var(--bg-card)] border border-l-4 transition-all duration-200 ${
         hovered ? 'shadow-md' : 'shadow-sm'
       }`}
+      aria-label={`Rank ${rank}: ${associate.displayName} with ${associate.seasonPoints} points, tier ${associate.currentTier}`}
       style={{
         borderLeftColor: TIER_COLORS[associate.currentTier],
         boxShadow: hovered
@@ -273,6 +295,13 @@ function PackRow({
 }) {
   const [hovered, setHovered] = useState(false);
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onCardClick(associate.id);
+    }
+  };
+
   return (
     <motion.div
       layout
@@ -283,6 +312,9 @@ function PackRow({
       onHoverStart={() => setHovered(true)}
       onHoverEnd={() => setHovered(false)}
       onClick={() => onCardClick(associate.id)}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
       className={`flex items-center gap-3 px-3 py-2.5 cursor-pointer transition-all border-b border-l-[2px] ${
         rowIndex % 2 === 0 ? 'bg-[var(--bg-card)]' : 'bg-[var(--bg-secondary)]'
       } ${hovered ? 'bg-[var(--bg-card-hover)]' : ''}`}
@@ -291,6 +323,7 @@ function PackRow({
           ? TIER_COLORS[associate.currentTier]
           : `${TIER_COLORS[associate.currentTier]}40`,
       }}
+      aria-label={`Rank ${rank}: ${associate.displayName} with ${associate.seasonPoints} points`}
     >
       <span className="text-sm font-heading font-bold text-[var(--text-muted)] w-7 flex-shrink-0 text-right">
         #{rank}
@@ -399,6 +432,10 @@ export default function Leaderboard({
   return (
     <div
       className="h-full overflow-y-auto px-4 py-4 space-y-6"
+      aria-label="Leaderboard"
+      role="region"
+      aria-live="polite"
+      aria-atomic="false"
       style={{
         background: `
           radial-gradient(ellipse 800px 400px at center top, rgba(255,215,0,0.08) 0%, transparent 70%),
