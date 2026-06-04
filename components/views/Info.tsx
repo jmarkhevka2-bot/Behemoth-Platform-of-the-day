@@ -158,9 +158,9 @@ export default function Info() {
         <Section icon="👑" title="Platform of the Day" color={BORDER_COLORS[2]}>
           <div className="pt-2 space-y-2">
             <Bullet><strong className="text-[var(--text-primary)]">Single Crown:</strong> Tap 👑 Crown POTD in the header during an active shift. Pick the winner from the crew list — they receive {settings.pointValues.potd ?? 5} pts and a ceremony animation.</Bullet>
-            <Bullet><strong className="text-[var(--text-primary)]">Multi-Award Mode (⚡):</strong> In the POTD ceremony, tap "⚡ Multi-Award" to select multiple associates. All selected receive {settings.pointValues.potd ?? 5} pts simultaneously. A combined celebration plays.</Bullet>
+            <Bullet><strong className="text-[var(--text-primary)]">Multi-Award Mode (⚡):</strong> In the POTD ceremony, tap &quot;⚡ Multi-Award&quot; to select multiple associates. All selected receive {settings.pointValues.potd ?? 5} pts simultaneously. A combined celebration plays.</Bullet>
             <Bullet><strong className="text-[var(--text-primary)]">After crowning:</strong> POTD win count increments, points are awarded, a full-screen ceremony plays, and badge checks run.</Bullet>
-            <Bullet>If no POTD is crowned before 10:00 PM, the end-of-shift recap shows "No POTD crowned today".</Bullet>
+            <Bullet>If no POTD is crowned before 10:00 PM, the end-of-shift recap shows &quot;No POTD crowned today&quot;.</Bullet>
           </div>
         </Section>
       )}
@@ -169,7 +169,7 @@ export default function Info() {
       {showSection('⚔️ Daily Rivalry') && (
         <Section icon="⚔️" title="Daily Rivalry" color={BORDER_COLORS[3]}>
           <div className="pt-2 space-y-2">
-            <Bullet><strong className="text-[var(--text-primary)]">Auto-selection:</strong> At 10:00 AM, the system picks the two associates with the closest season points as today's rivals. Their names appear in the shift-start banner and the header.</Bullet>
+            <Bullet><strong className="text-[var(--text-primary)]">Auto-selection:</strong> At 10:00 AM, the system picks the two associates with the closest season points as today&apos;s rivals. Their names appear in the shift-start banner and the header.</Bullet>
             <Bullet><strong className="text-[var(--text-primary)]">Head-to-head:</strong> During the shift, their emoji/names are shown in the header. Track their daily points in the Crew Grid or Leaderboard.</Bullet>
             <Bullet><strong className="text-[var(--text-primary)]">End-of-shift bonus:</strong> +3 pts to the winner (higher daily points), or +2 pts each if tied. Awarded automatically at shift end.</Bullet>
             <Bullet>The same pair will not be matched more than once every 3 days. (Coming in a future update.)</Bullet>

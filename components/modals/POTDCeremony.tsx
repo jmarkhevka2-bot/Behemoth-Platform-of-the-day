@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { useAppState } from '@/lib/hooks/useAppState';
@@ -62,7 +62,15 @@ export default function POTDCeremony({ onClose }: Props) {
   }
 
   function handleMultiToggle(id: string) {
-    setMultiSelected(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+    setMultiSelected(prev => {
+      const n = new Set(prev);
+      if (n.has(id)) {
+        n.delete(id);
+      } else {
+        n.add(id);
+      }
+      return n;
+    });
   }
 
   const multiSelectedAssociates = useMemo(() =>

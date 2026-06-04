@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import type { Tier, TierConfig } from '@/lib/types';
-import { getTierProgress, getNextTierConfig } from '@/lib/utils/tiers';
+import { getTierProgress } from '@/lib/utils/tiers';
 
 const TIER_FILL_CLASS: Record<Tier, string> = {
   none:    'bg-[var(--border)]',

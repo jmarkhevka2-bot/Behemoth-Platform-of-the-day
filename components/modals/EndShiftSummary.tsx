@@ -12,7 +12,7 @@ interface Props {
   onStartNew: () => void;
 }
 
-export default function EndShiftSummary({ onClose, onStartNew: _onStartNew }: Props) {
+export default function EndShiftSummary({ onClose }: Props) {
   const { state, dispatch } = useAppState();
   const data = state.lastEndShiftData;
   if (!data) return null;
@@ -78,7 +78,6 @@ export default function EndShiftSummary({ onClose, onStartNew: _onStartNew }: Pr
                   { id: rival.id2, name: rival.name2, emoji: rival.emoji2, pts: rival.pts2 },
                 ].map((r, i) => {
                   const isWinner = rival.winnerId === r.id;
-                  const isTied   = rival.tied;
                   return (
                     <div key={r.id} className={`flex-1 text-center ${i === 0 ? 'text-left' : 'text-right'}`}>
                       <span className="text-3xl leading-none block">{r.emoji}</span>

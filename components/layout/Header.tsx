@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useAppState } from '@/lib/hooks/useAppState';
 import { useTheme } from '@/lib/hooks/useTheme';
-import { formatNextTransition, shouldShiftBeActive } from '@/lib/utils/shiftSchedule';
+import { formatNextTransition } from '@/lib/utils/shiftSchedule';
 import ShiftTimer from '@/components/ui/ShiftTimer';
 
 interface Props {

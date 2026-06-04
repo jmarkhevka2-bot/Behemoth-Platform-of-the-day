@@ -9,7 +9,7 @@ import { formatTimestamp } from '@/lib/utils/dates';
 import { getNextTierConfig } from '@/lib/utils/tiers';
 import TierBadge from '@/components/ui/TierBadge';
 import PointCounter from '@/components/ui/PointCounter';
-import type { AwardEvent } from '@/lib/types';
+import type { AwardEvent, Associate, TierConfig } from '@/lib/types';
 
 interface FeedEvent extends AwardEvent {
   associateName: string;
@@ -40,13 +40,12 @@ function PodiumCard({
   nextTierConfig,
 }: {
   rank: 1 | 2 | 3;
-  associate: any;
+  associate: Associate;
   isAdmin: boolean;
   onCardClick: (id: string) => void;
   onAwardClick: (id: string) => void;
-  nextTierConfig: any;
+  nextTierConfig: TierConfig | null;
 }) {
-  const [hovered, setHovered] = useState(false);
 
   const gradients: Record<number, string> = {
     1: 'from-yellow-400 via-yellow-600 to-yellow-500',
@@ -68,8 +67,6 @@ function PodiumCard({
     <motion.div
       layout
       layoutId={`podium-${associate.id}`}
-      onHoverStart={() => setHovered(true)}
-      onHoverEnd={() => setHovered(false)}
       onClick={() => onCardClick(associate.id)}
       className={`relative cursor-pointer ${rank === 1 ? 'md:scale-110 md:mb-4' : ''}`}
     >
@@ -171,11 +168,11 @@ function ChasingCard({
   nextTierConfig,
 }: {
   rank: number;
-  associate: any;
+  associate: Associate;
   isAdmin: boolean;
   onCardClick: (id: string) => void;
   onAwardClick: (id: string) => void;
-  nextTierConfig: any;
+  nextTierConfig: TierConfig | null;
 }) {
   const [hovered, setHovered] = useState(false);
   const progressPercent = nextTierConfig
@@ -268,7 +265,7 @@ function PackRow({
   rowIndex,
 }: {
   rank: number;
-  associate: any;
+  associate: Associate;
   isAdmin: boolean;
   onCardClick: (id: string) => void;
   onAwardClick: (id: string) => void;
@@ -366,14 +363,6 @@ export default function Leaderboard({
   const chasing = sorted.slice(3, 10);
   const pack = sorted.slice(10);
   const [feedOpen, setFeedOpen] = useState(false);
-
-  const tiedMap = useMemo(() => {
-    const counts: Record<number, number> = {};
-    sorted.forEach((a) => {
-      counts[a.seasonPoints] = (counts[a.seasonPoints] ?? 0) + 1;
-    });
-    return counts;
-  }, [sorted]);
 
   const totalPts = useMemo(
     () => state.associates.reduce((s, a) => s + a.seasonPoints, 0),
