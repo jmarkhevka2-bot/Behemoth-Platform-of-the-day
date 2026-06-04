@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import Leaderboard from '../Leaderboard';
 import * as AppStateModule from '@/lib/hooks/useAppState';
+import type { AppSettings } from '@/lib/types';
 
 // Mock dependencies
 jest.mock('@/lib/hooks/useAppState', () => ({
@@ -59,10 +60,18 @@ const MOCK_STATE = {
     soundEnabled: true,
     darkMode: true,
     dispatchTarget: 'Dispatch',
-    pointValues: { potd: 5 } as any,
+    pointValues: {
+      fast_dispatch: 1,
+      spiel_master: 2,
+      safety_catch: 3,
+      guest_mvp: 2,
+      target_hit: 2,
+      potd: 5,
+      above_beyond: 3,
+    },
     tiers: [],
     shiftOverride: null,
-  },
+  } as AppSettings,
   potdWinner: null,
   dailyRival: null,
   pendingCelebration: null,

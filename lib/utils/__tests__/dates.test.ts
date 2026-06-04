@@ -1,4 +1,5 @@
 import { calculateNewStreak, toDateKey, recalculateStreak } from '../dates';
+import type { AwardEvent } from '@/lib/types';
 
 describe('Date Utilities', () => {
   describe('toDateKey', () => {
@@ -17,7 +18,6 @@ describe('Date Utilities', () => {
 
   describe('calculateNewStreak', () => {
     it('should start new streak when no previous points', () => {
-      const today = toDateKey(new Date());
       const streak = calculateNewStreak(0, null);
       expect(streak).toBe(1);
     });
@@ -60,10 +60,10 @@ describe('Date Utilities', () => {
       const dayBefore = new Date();
       dayBefore.setDate(dayBefore.getDate() - 2);
 
-      const history = [
-        { timestamp: today.toISOString() } as any,
-        { timestamp: yesterday.toISOString() } as any,
-        { timestamp: dayBefore.toISOString() } as any,
+      const history: AwardEvent[] = [
+        { timestamp: today.toISOString(), id: '1', associateId: '1', reason: '', reasonTag: 'custom', points: 1, shiftId: '' },
+        { timestamp: yesterday.toISOString(), id: '2', associateId: '1', reason: '', reasonTag: 'custom', points: 1, shiftId: '' },
+        { timestamp: dayBefore.toISOString(), id: '3', associateId: '1', reason: '', reasonTag: 'custom', points: 1, shiftId: '' },
       ];
 
       const streak = recalculateStreak(history);
@@ -75,9 +75,9 @@ describe('Date Utilities', () => {
       const twoDaysAgo = new Date();
       twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
 
-      const history = [
-        { timestamp: today.toISOString() } as any,
-        { timestamp: twoDaysAgo.toISOString() } as any,
+      const history: AwardEvent[] = [
+        { timestamp: today.toISOString(), id: '1', associateId: '1', reason: '', reasonTag: 'custom', points: 1, shiftId: '' },
+        { timestamp: twoDaysAgo.toISOString(), id: '2', associateId: '1', reason: '', reasonTag: 'custom', points: 1, shiftId: '' },
       ];
 
       const streak = recalculateStreak(history);
