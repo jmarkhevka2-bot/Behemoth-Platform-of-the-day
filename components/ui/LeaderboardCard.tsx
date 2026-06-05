@@ -97,16 +97,16 @@ const LeaderboardCard = forwardRef<HTMLDivElement, Props>(function LeaderboardCa
         )}
       </div>
 
-      {/* Award button — admin only */}
-      {isAdmin && (
-        <button
-          onClick={(e) => { e.stopPropagation(); onAwardClick(a.id); }}
-          className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-lg
-            text-[var(--text-hint)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-colors text-sm font-heading"
-          aria-label={`Award points to ${a.displayName}`}
-          title="Award points"
-        >+</button>
-      )}
+      {/* Points display — click to award points */}
+      <button
+        onClick={(e) => { e.stopPropagation(); onAwardClick(a.id); }}
+        className="flex-shrink-0 flex items-center justify-center rounded-lg
+          text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-colors font-heading font-bold text-2xl"
+        aria-label={`Award points to ${a.displayName}`}
+        title="Click to award points"
+      >
+        {a.seasonPoints}
+      </button>
     </motion.div>
   );
 });
