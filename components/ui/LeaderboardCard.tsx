@@ -52,10 +52,10 @@ const LeaderboardCard = forwardRef<HTMLDivElement, Props>(function LeaderboardCa
       aria-label={ariaLabel}
     >
       {/* Rank */}
-      <div className="w-7 flex-shrink-0 text-right">
+      <div className="w-10 flex-shrink-0 text-center">
         {isTop3
           ? <span className="text-base leading-none">{MEDAL[rank - 1]}</span>
-          : <span className="font-heading text-sm text-[var(--text-hint)]">{rank}</span>
+          : <span className="font-heading text-lg font-bold text-[var(--text-primary)]">#{rank}</span>
         }
       </div>
 
