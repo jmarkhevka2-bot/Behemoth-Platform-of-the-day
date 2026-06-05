@@ -12,6 +12,7 @@ interface Props {
   associate: Associate;
   onCardClick: (id: string) => void;
   onAwardClick: (id: string) => void;
+  rank?: number;
   // Multi-select
   multiSelectMode?: boolean;
   isSelected?: boolean;
@@ -33,7 +34,7 @@ const ACCENT: Record<string, string> = {
 };
 
 export default function AssociateCard({
-  associate: a, onCardClick, onAwardClick,
+  associate: a, onCardClick, onAwardClick, rank,
   multiSelectMode, isSelected, onToggleSelect,
   isAdmin = true,
   potdSelectMode, isPOTDSelected, onTogglePOTD,
@@ -113,7 +114,10 @@ export default function AssociateCard({
 
       {/* Top row */}
       <div className="flex items-start justify-between mb-1.5">
-        <span className="text-2xl leading-none">{a.emoji}</span>
+        <div className="flex items-center gap-1">
+          <span className="text-2xl leading-none">{a.emoji}</span>
+          {rank && <span className="text-xs font-heading font-bold text-[var(--text-muted)]">#{rank}</span>}
+        </div>
         {!multiSelectMode && !potdSelectMode && (
           <div className="flex items-center gap-1">
             {a.streak > 0 && (

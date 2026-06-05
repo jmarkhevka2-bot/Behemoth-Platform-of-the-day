@@ -128,13 +128,16 @@ export default function CrewGrid({ onCardClick, onAwardClick, onBulkAward, isAdm
       {/* Grid */}
       <div className="flex-1 overflow-y-auto p-3">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
-          {filtered.map((a, i) => (
-            <motion.div key={a.id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.02, duration: 0.2 }}>
-              <AssociateCard associate={a} onCardClick={onCardClick} onAwardClick={onAwardClick}
-                multiSelectMode={multiSelectMode} isSelected={selectedIds.has(a.id)}
-                onToggleSelect={handleToggleSelect} isAdmin={isAdmin} />
-            </motion.div>
-          ))}
+          {filtered.map((a, i) => {
+            const rank = sort === 'season' ? i + 1 : undefined;
+            return (
+              <motion.div key={a.id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.02, duration: 0.2 }}>
+                <AssociateCard associate={a} onCardClick={onCardClick} onAwardClick={onAwardClick}
+                  rank={rank} multiSelectMode={multiSelectMode} isSelected={selectedIds.has(a.id)}
+                  onToggleSelect={handleToggleSelect} isAdmin={isAdmin} />
+              </motion.div>
+            );
+          })}
         </div>
 
         {filtered.length === 0 && (
