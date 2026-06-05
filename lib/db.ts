@@ -178,32 +178,59 @@ export async function syncToSupabase(
     }
   }
 
-  // Run core writes in parallel
-  await Promise.all([
+  // Run core writes in parallel with error checking
+  const [assocRes, settingsRes] = await Promise.all([
     supabase.from('associates').upsert(assocRows, { onConflict: 'id' }),
     supabase.from('season_settings').upsert(settingsRow, { onConflict: 'id' }),
   ]);
 
+  if (assocRes.error) {
+    console.error('❌ Failed to sync associates:', assocRes.error);
+    throw new Error(`Associates sync failed: ${assocRes.error.message}`);
+  }
+
+  if (settingsRes.error) {
+    console.error('❌ Failed to sync settings:', settingsRes.error);
+    throw new Error(`Settings sync failed: ${settingsRes.error.message}`);
+  }
+
+  console.log('✅ Synced', assocRows.length, 'associates');
+
   // Insert new award events
   if (newEvents.length > 0) {
-    await supabase.from('award_events').upsert(newEvents, { onConflict: 'id', ignoreDuplicates: true });
+    const eventsRes = await supabase.from('award_events').insert(newEvents);
+    if (eventsRes.error) {
+      console.error('❌ Failed to sync award events:', eventsRes.error);
+      throw new Error(`Award events sync failed: ${eventsRes.error.message}`);
+    }
+    console.log('✅ Synced', newEvents.length, 'award events');
   }
 
   // Hall of fame entries
   if (hofRows.length > 0) {
-    await supabase.from('hall_of_fame').upsert(hofRows, { onConflict: 'associate_id,tier_reached', ignoreDuplicates: true });
+    const hofRes = await supabase.from('hall_of_fame').insert(hofRows);
+    if (hofRes.error) {
+      console.error('❌ Failed to sync hall of fame:', hofRes.error);
+      throw new Error(`Hall of fame sync failed: ${hofRes.error.message}`);
+    }
+    console.log('✅ Synced', hofRows.length, 'hall of fame entries');
   }
 
   // POTD history
   if (state.potdWinner) {
     const winner = state.associates.find(a => a.id === state.potdWinner);
     if (winner) {
-      await supabase.from('potd_history').upsert({
+      const potdRes = await supabase.from('potd_history').upsert({
         associate_id:    state.potdWinner,
         shift_date:      state.shift.date || new Date().toISOString().slice(0, 10),
         points_that_day: winner.dailyPoints,
         crowned_at:      new Date().toISOString(),
-      }, { onConflict: 'shift_date', ignoreDuplicates: true });
+      }, { onConflict: 'shift_date' });
+      if (potdRes.error) {
+        console.error('❌ Failed to sync POTD history:', potdRes.error);
+        throw new Error(`POTD history sync failed: ${potdRes.error.message}`);
+      }
+      console.log('✅ Synced POTD winner');
     }
   }
 }
