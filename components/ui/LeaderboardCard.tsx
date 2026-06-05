@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import type { Associate } from '@/lib/types';
 import TierBadge from './TierBadge';
 import PointCounter from './PointCounter';
-import { useAppState } from '@/lib/hooks/useAppState';
 
 interface Props {
   associate: Associate;
@@ -21,7 +20,6 @@ const MEDAL = ['🥇', '🥈', '🥉'];
 const LeaderboardCard = forwardRef<HTMLDivElement, Props>(function LeaderboardCard(
   { associate: a, rank, onCardClick, onAwardClick, isTied, isAdmin = true }, ref
 ) {
-  const { state } = useAppState();
   const isTop3  = rank <= 3;
   const isFirst = rank === 1;
 
@@ -99,19 +97,15 @@ const LeaderboardCard = forwardRef<HTMLDivElement, Props>(function LeaderboardCa
         )}
       </div>
 
-      {/* Award button — admin + shift active only */}
+      {/* Award button — admin only */}
       {isAdmin && (
-        state.shift.active ? (
-          <button
-            onClick={(e) => { e.stopPropagation(); onAwardClick(a.id); }}
-            className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-lg
-              text-[var(--text-hint)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-colors text-sm font-heading"
-            aria-label={`Award points to ${a.displayName}`}
-            title="Award points"
-          >+</button>
-        ) : (
-          <span className="flex-shrink-0 w-7 h-7 flex items-center justify-center text-[var(--text-hint)]/30 text-sm font-heading cursor-not-allowed" aria-label="Shift not active" title="Shift not active">+</span>
-        )
+        <button
+          onClick={(e) => { e.stopPropagation(); onAwardClick(a.id); }}
+          className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-lg
+            text-[var(--text-hint)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-colors text-sm font-heading"
+          aria-label={`Award points to ${a.displayName}`}
+          title="Award points"
+        >+</button>
       )}
     </motion.div>
   );

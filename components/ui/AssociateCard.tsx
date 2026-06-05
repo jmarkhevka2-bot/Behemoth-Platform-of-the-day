@@ -150,9 +150,9 @@ export default function AssociateCard({
         )}
       </div>
 
-      {/* Hover award button (normal mode only, admin + shift active) */}
+      {/* Hover award button (normal mode only, admin) */}
       <AnimatePresence>
-        {hovered && !multiSelectMode && !potdSelectMode && isAdmin && state.shift.active && (
+        {hovered && !multiSelectMode && !potdSelectMode && isAdmin && (
           <motion.button
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
