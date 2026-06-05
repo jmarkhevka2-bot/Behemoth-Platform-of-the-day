@@ -9,7 +9,7 @@ import { formatTimestamp } from '@/lib/utils/dates';
 import { getNextTierConfig } from '@/lib/utils/tiers';
 import type { AwardEvent } from '@/lib/types';
 import PodiumCard from '@/components/leaderboard/PodiumCard';
-import ChasingCard from '@/components/leaderboard/ChasingCard';
+import AssociateCard from '@/components/ui/AssociateCard';
 import PackRow from '@/components/leaderboard/PackRow';
 import StatCard from '@/components/leaderboard/StatCard';
 import SectionHeader from '@/components/leaderboard/SectionHeader';
@@ -140,17 +140,17 @@ export default function Leaderboard({
         <div>
           <SectionHeader icon="⚡" title="CHASING THE PODIUM" color="#C0C0C0" />
           <AnimatePresence>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
               {chasing.map((a, i) => (
-                <ChasingCard
-                  key={a.id}
-                  rank={4 + i}
-                  associate={a}
-                  isAdmin={isAdmin}
-                  onCardClick={onCardClick}
-                  onAwardClick={onAwardClick}
-                  nextTierConfig={getNextTierConfig(a.seasonPoints, state.settings.tiers)}
-                />
+                <motion.div key={a.id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.02, duration: 0.2 }}>
+                  <AssociateCard
+                    associate={a}
+                    rank={4 + i}
+                    isAdmin={isAdmin}
+                    onCardClick={onCardClick}
+                    onAwardClick={onAwardClick}
+                  />
+                </motion.div>
               ))}
             </div>
           </AnimatePresence>
