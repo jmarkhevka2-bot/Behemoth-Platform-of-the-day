@@ -65,7 +65,7 @@ const LeaderboardCard = forwardRef<HTMLDivElement, Props>(function LeaderboardCa
       {/* Name + badges */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 flex-wrap">
-          <span className={`font-body font-semibold text-sm leading-tight ${isFirst ? 'text-[var(--accent-gold)]' : 'text-[var(--text-primary)]'}`}>
+          <span className={`font-body font-semibold leading-tight ${isTop3 ? 'text-lg' : 'text-sm'} ${isFirst ? 'text-[var(--accent-gold)]' : 'text-[var(--text-primary)]'}`}>
             {a.displayName}
           </span>
           <TierBadge tier={a.currentTier} size="xs" />
