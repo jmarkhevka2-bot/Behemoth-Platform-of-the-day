@@ -74,6 +74,7 @@ export default function AssociateCard({
       className={`
         relative bg-[var(--bg-card)] border border-l-[3px] rounded-xl p-3 cursor-pointer
         select-none border-[var(--border)] ${ACCENT[a.currentTier]}
+        flex flex-col min-h-[220px]
         ${isPOTDSelected
           ? 'potd-selected-glow ring-2 ring-[var(--accent-gold)] ring-offset-1'
           : isSelected
