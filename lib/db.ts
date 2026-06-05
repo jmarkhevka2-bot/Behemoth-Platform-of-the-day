@@ -88,7 +88,7 @@ export async function fetchStateFromSupabase(): Promise<AppState | null> {
       startTime:      settingsRow?.shift_start_time ?? null,
       target:         settingsRow?.daily_target   ?? DEFAULT_SETTINGS.dispatchTarget,
       dailyChallenge: '',
-      date:           settingsRow?.current_date   ?? '',
+      date:           settingsRow?.date_key   ?? '',
     },
     settings: {
       soundEnabled:   DEFAULT_SETTINGS.soundEnabled,
@@ -139,7 +139,7 @@ export async function syncToSupabase(
     shift_active:     state.shift.active,
     shift_start_time: state.shift.startTime ?? null,
     shift_id:         state.shift.id,
-    current_date:     state.shift.date,
+    date_key:         state.shift.date,
     point_values:     state.settings.pointValues,
     tier_thresholds:  state.settings.tiers,
     potd_winner_id:   state.potdWinner ?? null,
