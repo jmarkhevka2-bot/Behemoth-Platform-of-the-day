@@ -99,7 +99,7 @@ export async function fetchStateFromSupabase(): Promise<AppState | null> {
       shiftOverride: settingsRow?.shift_override ?? null,
     },
     potdWinner:          potdRows?.[0]?.associate_id ?? null,
-    dailyRival:          settingsRow?.daily_rival    ?? null,
+    dailyRival:          null,
     pendingCelebration:  null,
     pendingPOTD:         false,
     lastEndShiftData:    null,
@@ -142,7 +142,6 @@ export async function syncToSupabase(
     point_values:     state.settings.pointValues,
     tier_thresholds:  state.settings.tiers,
     potd_winner_id:   state.potdWinner ?? null,
-    daily_rival:      state.dailyRival ?? null,
     shift_override:   state.settings.shiftOverride ?? null,
   };
 
