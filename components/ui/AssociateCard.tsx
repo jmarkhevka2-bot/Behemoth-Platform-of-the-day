@@ -44,7 +44,12 @@ export default function AssociateCard({
   function handleClick() {
     if (potdSelectMode && onTogglePOTD) return onTogglePOTD(a.id);
     if (multiSelectMode && onToggleSelect) return onToggleSelect(a.id);
-    onCardClick(a.id);
+    // In normal mode, click to award points (admin only)
+    if (!potdSelectMode && !multiSelectMode && isAdmin) {
+      onAwardClick(a.id);
+    } else {
+      onCardClick(a.id);
+    }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -151,21 +156,12 @@ export default function AssociateCard({
         )}
       </div>
 
-      {/* Hover award button (normal mode only, admin) */}
-      <AnimatePresence>
-        {hovered && !multiSelectMode && !potdSelectMode && isAdmin && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.1 }}
-            onClick={(e) => { e.stopPropagation(); onAwardClick(a.id); }}
-            className="absolute bottom-2 right-2 px-2 py-1 bg-[#1C1917] text-white text-[10px] font-semibold font-body rounded-lg shadow-md"
-          >
-            + Award
-          </motion.button>
-        )}
-      </AnimatePresence>
+      {/* Points display (normal mode only) */}
+      {!multiSelectMode && !potdSelectMode && (
+        <div className="absolute top-2 right-2 bg-[#1C1917] text-white px-3 py-1.5 rounded-lg shadow-md">
+          <p className="font-heading text-xl font-bold leading-none">{a.seasonPoints}</p>
+        </div>
+      )}
     </motion.div>
   );
 }
