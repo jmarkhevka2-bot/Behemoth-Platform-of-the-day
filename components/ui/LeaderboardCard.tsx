@@ -87,13 +87,13 @@ const LeaderboardCard = forwardRef<HTMLDivElement, Props>(function LeaderboardCa
       </div>
 
       {/* Points */}
-      <div className="flex-shrink-0 text-right">
+      <div className="flex-shrink-0 text-right ml-4 min-w-[60px]">
         <PointCounter
           value={a.seasonPoints}
-          className={`font-heading text-lg leading-none block ${isFirst ? 'text-[var(--accent-gold)]' : 'text-[var(--text-primary)]'}`}
+          className={`font-heading text-2xl leading-none block font-bold ${isFirst ? 'text-[var(--accent-gold)]' : 'text-[var(--text-primary)]'}`}
         />
         {a.dailyPoints > 0 && (
-          <span className="text-[10px] text-[var(--accent-blue)] font-body">+{a.dailyPoints}</span>
+          <span className="text-[11px] text-[var(--accent-blue)] font-body font-semibold">+{a.dailyPoints}</span>
         )}
       </div>
 
