@@ -133,60 +133,48 @@ export default function POTDCeremony({ onClose }: Props) {
         {stage === 'select' && (
           <motion.div key="select" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="flex-1 flex flex-col p-4 overflow-hidden">
-            <div className="flex items-center justify-between mb-1">
-              <h2 className="font-heading text-[var(--text-primary)] text-2xl tracking-wide">PLATFORM OF THE DAY</h2>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="font-heading text-[var(--text-primary)] text-2xl tracking-wide">CROWN POTD</h2>
               <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setStage('multi-select')}
+                  className="px-3 py-1.5 text-xs font-heading rounded-lg border border-[var(--accent-gold)]/50 text-[var(--accent-gold)] hover:bg-[var(--accent-gold)]/10 transition-colors"
+                  title="Award POTD to multiple associates today"
+                >
+                  ⚡ Multi-Award
+                </button>
                 <button
                   onClick={() => setStage('multi-day-select')}
                   className="px-3 py-1.5 text-xs font-heading rounded-lg border border-[var(--accent-gold)]/50 text-[var(--accent-gold)] hover:bg-[var(--accent-gold)]/10 transition-colors"
                   title="Award POTD for multiple past dates"
                 >
-                  📅 Multi-Day Mode
+                  📅 Multi-Day
                 </button>
                 <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] transition-colors">✕</button>
               </div>
             </div>
-            <p className="text-[var(--text-muted)] text-xs font-body mb-4">Sorted by today&apos;s points. You choose the winner.</p>
 
-            <div className="flex-1 overflow-y-auto space-y-1.5 pb-2">
-              {topScorers.map((a, i) => (
-                <motion.div key={a.id} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.04 }}
-                  className="flex items-center gap-3 px-3 py-2.5 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl shadow-sm">
-                  <span className="font-heading text-sm w-5 text-right text-[var(--text-hint)] flex-shrink-0">{i + 1}</span>
-                  <span className="text-xl leading-none">{a.emoji}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-body font-semibold text-[var(--text-primary)] text-sm">{a.displayName}</p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-xs text-[var(--accent-blue)] font-heading">+{a.dailyPoints}</span>
-                      <TierBadge tier={a.currentTier} size="xs" />
-                    </div>
-                  </div>
-                  <button onClick={() => handleCrown(a)}
-                    className="px-3 py-1.5 bg-[var(--accent-gold)] text-white font-heading text-xs rounded-xl hover:opacity-90 transition-all flex-shrink-0">
-                    👑 Crown
-                  </button>
-                </motion.div>
-              ))}
-              {topScorers.length === 0 && (
-                <p className="text-[var(--text-muted)] text-center font-body py-8 text-sm">No points awarded today yet</p>
-              )}
+            <div className="flex-1 overflow-y-auto pb-2">
+              <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2">
+                {allAssociates.map((a, i) => (
+                  <motion.button
+                    key={a.id}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: i * 0.02 }}
+                    onClick={() => handleCrown(a)}
+                    className="p-2.5 bg-[var(--bg-card)] border border-[var(--border)] rounded-lg text-center hover:bg-[var(--bg-secondary)] hover:border-[var(--accent-gold)]/40 transition-all group"
+                    title={a.displayName}
+                  >
+                    <span className="text-2xl leading-none block mb-1">{a.emoji}</span>
+                    <p className="text-[9px] text-[var(--text-primary)] font-body truncate">{a.displayName}</p>
+                    {a.dailyPoints > 0 && (
+                      <p className="text-[8px] text-[var(--accent-blue)] font-heading mt-0.5">+{a.dailyPoints}</p>
+                    )}
+                  </motion.button>
+                ))}
+              </div>
             </div>
-
-            {zeroScorers.length > 0 && (
-              <>
-                <p className="text-[var(--text-hint)] text-[10px] font-body text-center mt-2 mb-1.5">Or crown from full crew:</p>
-                <div className="grid grid-cols-5 gap-1 max-h-24 overflow-y-auto">
-                  {zeroScorers.map(a => (
-                    <button key={a.id} onClick={() => handleCrown(a)}
-                      className="p-1.5 bg-[var(--bg-card)] border border-[var(--border)] rounded-lg text-center hover:bg-[var(--bg-secondary)] transition-colors"
-                      title={a.displayName}>
-                      <span className="text-lg leading-none">{a.emoji}</span>
-                      <p className="text-[9px] text-[var(--text-muted)] font-body truncate mt-0.5">{a.displayName}</p>
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
           </motion.div>
         )}
 
