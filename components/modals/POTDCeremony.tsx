@@ -137,11 +137,11 @@ export default function POTDCeremony({ onClose }: Props) {
               <h2 className="font-heading text-[var(--text-primary)] text-2xl tracking-wide">PLATFORM OF THE DAY</h2>
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => setStage('multi-select')}
+                  onClick={() => setStage('multi-day-select')}
                   className="px-3 py-1.5 text-xs font-heading rounded-lg border border-[var(--accent-gold)]/50 text-[var(--accent-gold)] hover:bg-[var(--accent-gold)]/10 transition-colors"
-                  title="Award POTD to multiple associates on the same day"
+                  title="Award POTD for multiple past dates"
                 >
-                  ⚡ Multi-Day Mode
+                  📅 Multi-Day Mode
                 </button>
                 <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] transition-colors">✕</button>
               </div>
