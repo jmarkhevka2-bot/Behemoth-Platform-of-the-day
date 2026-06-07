@@ -163,7 +163,7 @@ export default function POTDCeremony({ onClose }: Props) {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: i * 0.02 }}
                     onClick={() => handleCrown(a)}
-                    className="p-4 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl text-center hover:bg-[var(--bg-secondary)] hover:border-[var(--accent-gold)]/50 transition-all group flex flex-col items-center justify-center min-h-[100px]"
+                    className="p-4 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl text-center hover:bg-[var(--bg-secondary)] hover:border-[var(--accent-gold)]/60 active:scale-95 transition-all group flex flex-col items-center justify-center min-h-[110px]"
                     title={a.displayName}
                   >
                     <span className="text-4xl leading-none block mb-2">{a.emoji}</span>

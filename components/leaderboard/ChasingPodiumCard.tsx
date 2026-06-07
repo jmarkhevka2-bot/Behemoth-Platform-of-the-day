@@ -43,7 +43,7 @@ export default function ChasingPodiumCard({
         tabIndex={0}
         onClick={() => onCardClick(a.id)}
         onKeyDown={handleKeyDown}
-        className="h-full relative bg-gradient-to-br from-[var(--bg-card)] to-[#1A1A1A] border border-[#2A2A2A] rounded-xl overflow-hidden group cursor-pointer transition-all hover:border-[#3A3A3A] hover:shadow-lg"
+        className="h-full relative bg-gradient-to-br from-[var(--bg-card)] to-[#1A1A1A] border border-[#2A2A2A] rounded-xl overflow-hidden group cursor-pointer transition-all hover:border-[#3A3A3A] hover:shadow-lg active:scale-95"
       >
         {/* Animated gradient overlay on hover */}
         <div className="absolute inset-0 bg-gradient-to-r from-[var(--accent-gold)]/0 via-transparent to-[var(--accent-gold)]/0 group-hover:from-[var(--accent-gold)]/5 group-hover:via-transparent group-hover:to-[var(--accent-gold)]/5 transition-all duration-300" />

@@ -97,7 +97,60 @@ body {
   animation: gold-pulse 3s ease-in-out infinite;
 }
 
+/* ── Modal backdrop ────────────────────────────────────── */
+.modal-backdrop {
+  backdrop-filter: blur(3px);
+  background: var(--modal-bg);
+}
+
 /* ── Scrollbar ─────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-color: var(--border) transparent;
+  scrollbar-width: thin;
+}
+
+/* ── Focus states ──────────────────────────────────────── */
+button:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+}
+
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 0px;
+}
+
+/* ── Selection ─────────────────────────────────────────── */
+::selection {
+  background-color: var(--accent-gold);
+  color: white;
+}
+
+/* ── Prevent layout shift from scrollbar ───────────────── */
+html {
+  overflow-y: scroll;
+}
 * {
   scrollbar-width: thin;
   scrollbar-color: rgba(128,128,128,0.15) transparent;

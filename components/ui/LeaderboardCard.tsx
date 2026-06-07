@@ -36,13 +36,13 @@ const LeaderboardCard = forwardRef<HTMLDivElement, Props>(function LeaderboardCa
     <motion.div
       ref={ref}
       whileHover={{ x: 2 }}
-      whileTap={{ scale: 0.99 }}
+      whileTap={{ scale: 0.97 }}
       transition={{ type: 'spring', stiffness: 400, damping: 35 }}
       role="button"
       tabIndex={0}
       className={`
         flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer
-        bg-[var(--bg-card)] border border-l-[3px] select-none transition-shadow
+        bg-[var(--bg-card)] border border-l-[3px] select-none transition-shadow active:scale-95
         ${isFirst
           ? 'gold-glow-pulse border-[var(--accent-gold)]/30 accent-gold'
           : 'border-[var(--border)] accent-none hover:shadow-sm'}
