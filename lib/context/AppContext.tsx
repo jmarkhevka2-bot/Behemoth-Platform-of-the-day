@@ -20,6 +20,7 @@ export type Action =
   | { type: 'END_SHIFT' }
   | { type: 'CROWN_POTD'; associateId: string }
   | { type: 'CROWN_MULTI_POTD'; associateIds: string[] }
+  | { type: 'CROWN_MULTI_DAY_POTD'; selections: Array<{ date: string; associateId: string }> }
   | { type: 'RESET_DAILY' }
   | { type: 'RESET_SEASON' }
   | { type: 'UPDATE_SETTINGS'; settings: Partial<AppSettings> }
@@ -243,6 +244,77 @@ function appReducer(state: AppState, action: Action): AppState {
         ...state,
         associates: finalAssociates,
         potdWinner: action.associateIds[action.associateIds.length - 1] ?? state.potdWinner,
+        pendingPOTD: false,
+        pendingCelebration,
+        pendingBadgeUnlocks: [...state.pendingBadgeUnlocks, ...allNewBadgeUnlocks],
+      };
+    }
+
+    case 'CROWN_MULTI_DAY_POTD': {
+      const potdPoints = state.settings.pointValues.potd ?? 5;
+      let allNewBadgeUnlocks: Array<{ associateId: string; badge: BadgeKey }> = [];
+      let pendingCelebration = state.pendingCelebration;
+      const selectedIds = new Set(action.selections.map(s => s.associateId));
+
+      const associates = state.associates.map(a => {
+        if (!selectedIds.has(a.id)) return a;
+
+        // Count how many POTDs this associate won
+        const potdCount = action.selections.filter(s => s.associateId === a.id).length;
+        const totalPotdPoints = potdPoints * potdCount;
+
+        const potdEvents: AwardEvent[] = action.selections
+          .filter(s => s.associateId === a.id)
+          .map(s => ({
+            id: uuid(),
+            associateId: a.id,
+            reason: `Platform of the Day (${new Date(s.date).toLocaleDateString()})`,
+            reasonTag: 'potd' as const,
+            points: potdPoints,
+            timestamp: new Date().toISOString(),
+            shiftId: state.shift.id,
+          }));
+
+        const newSeasonPoints = a.seasonPoints + totalPotdPoints;
+        const newTier = getTier(newSeasonPoints, state.settings.tiers);
+        const tierUpgraded = isTierHigher(newTier, a.currentTier);
+
+        return {
+          ...a,
+          potdWins: a.potdWins + potdCount,
+          seasonPoints: newSeasonPoints,
+          currentTier: newTier,
+          tiersUnlocked: tierUpgraded && !a.tiersUnlocked.includes(newTier)
+            ? [...a.tiersUnlocked, newTier] : a.tiersUnlocked,
+          awardHistory: [...potdEvents, ...a.awardHistory].slice(0, 50),
+        };
+      });
+
+      // Badge checking for each crowned associate
+      for (const id of Array.from(selectedIds)) {
+        const prev = state.associates.find(a => a.id === id)!;
+        const next = associates.find(a => a.id === id)!;
+        const newBadgeKeys = checkNewBadges(prev, next, state.associates, associates, state.shift.id, 'potd');
+        if (newBadgeKeys.length > 0) {
+          allNewBadgeUnlocks = [...allNewBadgeUnlocks, ...newBadgeKeys.map(badge => ({ associateId: id, badge }))];
+        }
+        if (isTierHigher(next.currentTier, prev.currentTier)) {
+          pendingCelebration = { associateId: id, newTier: next.currentTier };
+        }
+      }
+
+      // Apply badge entries
+      const finalAssociates = allNewBadgeUnlocks.length > 0
+        ? associates.map(a => {
+            const earned = allNewBadgeUnlocks.filter(u => u.associateId === a.id).map(u => u.badge);
+            return earned.length > 0 ? { ...a, badges: [...a.badges, ...makeBadgeEntries(earned)] } : a;
+          })
+        : associates;
+
+      return {
+        ...state,
+        associates: finalAssociates,
+        potdWinner: action.selections[action.selections.length - 1]?.associateId ?? state.potdWinner,
         pendingPOTD: false,
         pendingCelebration,
         pendingBadgeUnlocks: [...state.pendingBadgeUnlocks, ...allNewBadgeUnlocks],

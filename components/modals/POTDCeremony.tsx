@@ -13,7 +13,8 @@ interface Props {
   onClose: () => void;
 }
 
-type Stage = 'select' | 'ceremony' | 'multi-select' | 'multi-ceremony';
+type Stage = 'select' | 'ceremony' | 'multi-select' | 'multi-ceremony' | 'multi-day-select' | 'multi-day-ceremony';
+type POTDSelection = { date: string; associateId: string };
 
 export default function POTDCeremony({ onClose }: Props) {
   const { state, dispatch } = useAppState();
@@ -22,6 +23,8 @@ export default function POTDCeremony({ onClose }: Props) {
   const [stage, setStage]     = useState<Stage>('select');
   const [winner, setWinner]   = useState<Associate | null>(null);
   const [multiSelected, setMultiSelected] = useState<Set<string>>(new Set());
+  const [multiDaySelections, setMultiDaySelections] = useState<POTDSelection[]>([]);
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
 
   // Single winner ceremony effects
   useEffect(() => {
@@ -73,6 +76,37 @@ export default function POTDCeremony({ onClose }: Props) {
     });
   }
 
+  function handleSelectWinnerForDate(associate: Associate) {
+    // Check if this date already has a winner
+    const existingIndex = multiDaySelections.findIndex(s => s.date === selectedDate);
+
+    if (existingIndex >= 0) {
+      // Replace existing winner for this date
+      const updated = [...multiDaySelections];
+      updated[existingIndex].associateId = associate.id;
+      setMultiDaySelections(updated);
+    } else {
+      // Add new date/winner pair
+      setMultiDaySelections([...multiDaySelections, { date: selectedDate, associateId: associate.id }]);
+    }
+
+    // Move to next date (day after selected date)
+    const nextDate = new Date(selectedDate);
+    nextDate.setDate(nextDate.getDate() + 1);
+    setSelectedDate(nextDate.toISOString().split('T')[0]);
+  }
+
+  function handleConfirmMultiDay() {
+    if (multiDaySelections.length === 0) return;
+    dispatch({ type: 'CROWN_MULTI_DAY_POTD', selections: multiDaySelections });
+    setStage('multi-day-ceremony');
+  }
+
+  const multiDayAssociates = useMemo(() =>
+    multiDaySelections.map(s => ({ selection: s, associate: state.associates.find(a => a.id === s.associateId) })).filter(x => x.associate),
+    [multiDaySelections, state.associates]
+  );
+
   const multiSelectedAssociates = useMemo(() =>
     state.associates.filter(a => multiSelected.has(a.id)),
     [state.associates, multiSelected]
@@ -105,9 +139,9 @@ export default function POTDCeremony({ onClose }: Props) {
                 <button
                   onClick={() => setStage('multi-select')}
                   className="px-3 py-1.5 text-xs font-heading rounded-lg border border-[var(--accent-gold)]/50 text-[var(--accent-gold)] hover:bg-[var(--accent-gold)]/10 transition-colors"
-                  title="Award POTD to multiple associates at once"
+                  title="Award POTD to multiple associates on the same day"
                 >
-                  ⚡ Multi-Award
+                  ⚡ Multi-Day Mode
                 </button>
                 <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] transition-colors">✕</button>
               </div>
@@ -300,6 +334,103 @@ export default function POTDCeremony({ onClose }: Props) {
           </motion.div>
         )}
 
+        {/* ── MULTI-DAY SELECT STAGE ── */}
+        {stage === 'multi-day-select' && (
+          <motion.div key="multi-day-select" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="flex-1 flex flex-col overflow-hidden">
+            {/* Header */}
+            <div className="flex-shrink-0 px-4 pt-4 pb-3 border-b border-[var(--border-subtle)]">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="font-heading text-[var(--text-primary)] text-xl tracking-wide">AWARD POTDs FOR MULTIPLE DAYS</h2>
+                  <p className="text-[var(--text-muted)] text-xs font-body mt-0.5">Select a date, choose the winner, repeat</p>
+                </div>
+                <button onClick={() => setStage('select')}
+                  className="w-7 h-7 flex items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] transition-colors">✕</button>
+              </div>
+            </div>
+
+            {/* Date Picker */}
+            <div className="flex-shrink-0 px-4 py-3 border-b border-[var(--border-subtle)] bg-[var(--bg-secondary)]">
+              <label className="block text-xs font-heading text-[var(--text-muted)] mb-2 tracking-widest">SELECT DATE</label>
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                max={new Date().toISOString().split('T')[0]}
+                className="w-full px-3 py-2 bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-primary)] rounded-lg focus:border-[var(--accent-gold)]/50 outline-none"
+              />
+              {multiDaySelections.find(s => s.date === selectedDate) && (
+                <p className="text-xs text-[var(--accent-gold)] font-heading mt-1">✓ Winner selected for this date</p>
+              )}
+            </div>
+
+            {/* Associates list for current date */}
+            <div className="flex-1 overflow-y-auto p-3">
+              <div className="space-y-1.5">
+                {topScorers.map((a, i) => {
+                  const isSelectedForDate = multiDaySelections.find(s => s.date === selectedDate)?.associateId === a.id;
+                  return (
+                    <motion.div key={a.id} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.04 }}
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all ${
+                        isSelectedForDate
+                          ? 'bg-[var(--accent-gold)]/20 border border-[var(--accent-gold)]/50'
+                          : 'bg-[var(--bg-card)] border border-[var(--border)] hover:border-[var(--accent-gold)]/30'
+                      }`}
+                      onClick={() => handleSelectWinnerForDate(a)}
+                    >
+                      {isSelectedForDate && <span className="text-[var(--accent-gold)] font-heading">✓</span>}
+                      <span className="text-xl leading-none">{a.emoji}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-body font-semibold text-[var(--text-primary)] text-sm">{a.displayName}</p>
+                        <p className="text-xs text-[var(--text-muted)] font-body">+{a.dailyPoints} pts</p>
+                      </div>
+                      {isSelectedForDate && <span className="text-[var(--accent-gold)]">👑</span>}
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Selected days summary */}
+            {multiDaySelections.length > 0 && (
+              <div className="flex-shrink-0 p-4 border-t border-[var(--border-subtle)] bg-[var(--bg-card)]">
+                <p className="text-xs font-heading text-[var(--text-muted)] tracking-widest mb-2">POTDs SCHEDULED ({multiDaySelections.length})</p>
+                <div className="space-y-1.5 max-h-24 overflow-y-auto">
+                  {multiDayAssociates.map(({ selection, associate }) => (
+                    <div key={selection.date} className="flex items-center justify-between px-2 py-1.5 bg-[var(--bg-secondary)] rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">{associate?.emoji}</span>
+                        <div>
+                          <p className="text-xs font-body text-[var(--text-primary)]">{associate?.displayName}</p>
+                          <p className="text-[9px] text-[var(--text-muted)]">{new Date(selection.date).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setMultiDaySelections(multiDaySelections.filter(s => s.date !== selection.date))}
+                        className="text-[var(--text-hint)] hover:text-[var(--text-secondary)] text-xs"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Confirm button */}
+            <div className="flex-shrink-0 p-4 border-t border-[var(--border-subtle)]">
+              <button
+                onClick={handleConfirmMultiDay}
+                disabled={multiDaySelections.length === 0}
+                className="w-full px-4 py-2.5 bg-[var(--accent-gold)] text-white font-heading text-sm rounded-xl disabled:opacity-40 hover:opacity-90 transition-all"
+              >
+                Confirm {multiDaySelections.length} POTDs
+              </button>
+            </div>
+          </motion.div>
+        )}
+
         {/* ── MULTI CEREMONY STAGE ── */}
         {stage === 'multi-ceremony' && (
           <motion.div key="multi-ceremony" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
@@ -333,6 +464,49 @@ export default function POTDCeremony({ onClose }: Props) {
             <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }}
               transition={{ delay: 0.4 + multiSelectedAssociates.length * 0.12 + 0.8 }}
               onClick={onClose}
+              className="px-10 py-3 bg-[#1C1917] text-white font-heading text-base rounded-xl hover:bg-[#2C2420] transition-colors">
+              DONE 👑
+            </motion.button>
+          </motion.div>
+        )}
+
+        {/* ── MULTI-DAY CEREMONY STAGE ── */}
+        {stage === 'multi-day-ceremony' && (
+          <motion.div key="multi-day-ceremony" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            className="flex-1 flex flex-col items-center justify-center text-center p-6 relative overflow-hidden">
+            {/* Spotlight */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-96 pointer-events-none"
+              style={{ background: 'linear-gradient(180deg, rgba(176,140,30,0.15) 0%, transparent 100%)', clipPath: 'polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%)' }} />
+
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
+              className="font-heading text-[var(--accent-gold)] text-sm tracking-[0.35em] mb-8">HISTORY CORRECTED</motion.p>
+
+            {/* POTDs reveal — staggered */}
+            <div className="relative z-10 mb-8 space-y-3 max-h-80 overflow-y-auto px-4">
+              {multiDayAssociates.map(({ selection, associate }, i) => (
+                <motion.div key={selection.date} initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 + i * 0.15, type: 'spring', stiffness: 300, damping: 28 }}
+                  className="flex flex-col items-center gap-2 p-3 rounded-xl bg-[var(--accent-gold)]/10 border border-[var(--accent-gold)]/30">
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="text-2xl leading-none">{associate?.emoji}</span>
+                    <div className="text-left">
+                      <p className="font-heading text-[var(--text-primary)] text-base">{associate?.displayName}</p>
+                      <p className="text-[10px] text-[var(--text-muted)] font-body">{new Date(selection.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 + multiDayAssociates.length * 0.15 + 0.3 }}
+              className="text-[var(--text-muted)] text-sm font-body mb-8">
+              {multiDayAssociates.length} Platform{multiDayAssociates.length !== 1 ? 's' : ''} of the Day awarded · +{(state.settings.pointValues.potd ?? 5) * multiDayAssociates.length} pts total
+            </motion.p>
+
+            <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 + multiDayAssociates.length * 0.15 + 0.8 }}
+              onClick={() => { onClose(); }}
               className="px-10 py-3 bg-[#1C1917] text-white font-heading text-base rounded-xl hover:bg-[#2C2420] transition-colors">
               DONE 👑
             </motion.button>
