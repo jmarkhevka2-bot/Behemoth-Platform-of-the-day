@@ -107,16 +107,15 @@ export default function Header({ onCrownPOTD, isAdmin }: Props) {
             {/* Crown POTD — admin + shift active only */}
             {isAdmin && shift.active && (
               <button
-                onClick={hasPOTD ? undefined : onCrownPOTD}
-                disabled={hasPOTD}
+                onClick={onCrownPOTD}
                 className={`
                   px-3 py-1.5 text-xs font-heading rounded-lg transition-colors border
                   ${hasPOTD
-                    ? 'bg-[var(--bg-secondary)] border-[var(--border)] text-[var(--text-hint)] cursor-default'
+                    ? 'bg-[var(--accent-gold)]/20 border-[var(--accent-gold)]/50 text-[var(--accent-gold)] hover:bg-[var(--accent-gold)]/30'
                     : 'bg-[var(--accent-gold)] border-[var(--accent-gold)] text-white hover:opacity-90'}
                 `}
-                aria-label={hasPOTD ? 'Platform of the Day already crowned' : 'Crown Platform of the Day'}
-                title={hasPOTD ? 'POTD already crowned' : 'Crown Platform of the Day'}
+                aria-label={hasPOTD ? 'Edit Platform of the Day' : 'Crown Platform of the Day'}
+                title={hasPOTD ? 'Click to award more POTDs or use Multi-Day Mode' : 'Crown Platform of the Day'}
               >
                 {hasPOTD ? '👑 Crowned' : '👑 CROWN POTD'}
               </button>
