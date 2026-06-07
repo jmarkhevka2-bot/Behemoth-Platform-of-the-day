@@ -154,8 +154,8 @@ export default function POTDCeremony({ onClose }: Props) {
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto pb-2">
-              <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-8 gap-2">
+            <div className="flex-1 overflow-y-auto">
+              <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-8 gap-3 h-full auto-rows-fr">
                 {allAssociates.map((a, i) => (
                   <motion.button
                     key={a.id}
@@ -163,13 +163,13 @@ export default function POTDCeremony({ onClose }: Props) {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: i * 0.02 }}
                     onClick={() => handleCrown(a)}
-                    className="p-2.5 bg-[var(--bg-card)] border border-[var(--border)] rounded-lg text-center hover:bg-[var(--bg-secondary)] hover:border-[var(--accent-gold)]/40 transition-all group"
+                    className="p-4 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl text-center hover:bg-[var(--bg-secondary)] hover:border-[var(--accent-gold)]/50 transition-all group flex flex-col items-center justify-center min-h-[100px]"
                     title={a.displayName}
                   >
-                    <span className="text-2xl leading-none block mb-1">{a.emoji}</span>
-                    <p className="text-[9px] text-[var(--text-primary)] font-body truncate">{a.displayName}</p>
+                    <span className="text-4xl leading-none block mb-2">{a.emoji}</span>
+                    <p className="text-[10px] text-[var(--text-primary)] font-body truncate font-semibold">{a.displayName}</p>
                     {a.dailyPoints > 0 && (
-                      <p className="text-[8px] text-[var(--accent-blue)] font-heading mt-0.5">+{a.dailyPoints}</p>
+                      <p className="text-[9px] text-[var(--accent-blue)] font-heading mt-1.5">+{a.dailyPoints}</p>
                     )}
                   </motion.button>
                 ))}
