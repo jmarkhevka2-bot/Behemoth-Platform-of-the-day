@@ -10,7 +10,6 @@ import { getNextTierConfig } from '@/lib/utils/tiers';
 import type { AwardEvent } from '@/lib/types';
 import PodiumCard from '@/components/leaderboard/PodiumCard';
 import AssociateCard from '@/components/ui/AssociateCard';
-import PackRow from '@/components/leaderboard/PackRow';
 import StatCard from '@/components/leaderboard/StatCard';
 import SectionHeader from '@/components/leaderboard/SectionHeader';
 
@@ -34,7 +33,6 @@ export default function Leaderboard({
   const sorted = useSortedLeaderboard();
   const podium = sorted.slice(0, 3);
   const chasing = sorted.slice(3, 10);
-  const pack = sorted.slice(10);
   const [feedOpen, setFeedOpen] = useState(false);
 
   const totalPts = useMemo(
@@ -151,28 +149,6 @@ export default function Leaderboard({
                     onAwardClick={onAwardClick}
                   />
                 </motion.div>
-              ))}
-            </div>
-          </AnimatePresence>
-        </div>
-      )}
-
-      {/* The Pack Section */}
-      {pack.length > 0 && (
-        <div>
-          <SectionHeader icon="🐑" title="THE PACK" color="#CD7F32" />
-          <AnimatePresence>
-            <div className="divide-y divide-[var(--border)] rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--bg-card)]">
-              {pack.map((a, i) => (
-                <PackRow
-                  key={a.id}
-                  rank={11 + i}
-                  associate={a}
-                  isAdmin={isAdmin}
-                  onCardClick={onCardClick}
-                  onAwardClick={onAwardClick}
-                  rowIndex={i}
-                />
               ))}
             </div>
           </AnimatePresence>
