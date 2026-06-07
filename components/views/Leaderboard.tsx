@@ -135,23 +135,35 @@ export default function Leaderboard({
 
       {/* Chasing the Podium Section */}
       {chasing.length > 0 && (
-        <div>
-          <SectionHeader icon="⚡" title="CHASING THE PODIUM" color="#C0C0C0" />
-          <AnimatePresence>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
-              {chasing.map((a, i) => (
-                <motion.div key={a.id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.02, duration: 0.2 }}>
-                  <AssociateCard
-                    associate={a}
-                    rank={4 + i}
-                    isAdmin={isAdmin}
-                    onCardClick={onCardClick}
-                    onAwardClick={onAwardClick}
-                  />
-                </motion.div>
-              ))}
-            </div>
-          </AnimatePresence>
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-[#C0C0C0]/5 via-transparent to-[#C0C0C0]/5 rounded-2xl pointer-events-none" />
+          <div className="relative">
+            <SectionHeader icon="⚡" title="CHASING THE PODIUM" color="#C0C0C0" />
+            <AnimatePresence>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 px-1">
+                {chasing.map((a, i) => (
+                  <motion.div
+                    key={a.id}
+                    initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ delay: i * 0.05, duration: 0.3, type: 'spring', stiffness: 200 }}
+                    whileHover={{ scale: 1.05, y: -5 }}
+                  >
+                    <div className="relative group">
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#C0C0C0]/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <AssociateCard
+                        associate={a}
+                        rank={4 + i}
+                        isAdmin={isAdmin}
+                        onCardClick={onCardClick}
+                        onAwardClick={onAwardClick}
+                      />
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </AnimatePresence>
+          </div>
         </div>
       )}
 
