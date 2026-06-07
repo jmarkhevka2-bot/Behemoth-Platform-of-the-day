@@ -155,7 +155,7 @@ export default function POTDCeremony({ onClose }: Props) {
             </div>
 
             <div className="flex-1 overflow-y-auto pb-2">
-              <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2">
+              <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-8 gap-2">
                 {allAssociates.map((a, i) => (
                   <motion.button
                     key={a.id}
