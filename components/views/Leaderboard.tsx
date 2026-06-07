@@ -140,24 +140,27 @@ export default function Leaderboard({
           <div className="relative">
             <SectionHeader icon="⚡" title="CHASING THE PODIUM" color="#C0C0C0" />
             <AnimatePresence>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 px-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {chasing.map((a, i) => (
                   <motion.div
                     key={a.id}
                     initial={{ opacity: 0, scale: 0.9, y: 10 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     transition={{ delay: i * 0.05, duration: 0.3, type: 'spring', stiffness: 200 }}
-                    whileHover={{ scale: 1.05, y: -5 }}
+                    whileHover={{ scale: 1.02, y: -8 }}
+                    className="h-full"
                   >
-                    <div className="relative group">
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#C0C0C0]/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <AssociateCard
-                        associate={a}
-                        rank={4 + i}
-                        isAdmin={isAdmin}
-                        onCardClick={onCardClick}
-                        onAwardClick={onAwardClick}
-                      />
+                    <div className="relative group h-full">
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#C0C0C0]/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <div className="h-full">
+                        <AssociateCard
+                          associate={a}
+                          rank={4 + i}
+                          isAdmin={isAdmin}
+                          onCardClick={onCardClick}
+                          onAwardClick={onAwardClick}
+                        />
+                      </div>
                     </div>
                   </motion.div>
                 ))}
