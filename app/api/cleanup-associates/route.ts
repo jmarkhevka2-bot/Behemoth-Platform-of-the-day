@@ -26,6 +26,18 @@ export async function POST(request: Request) {
       return Response.json({ error: `Failed to delete Sehajpreet: ${delSehaj.message}` }, { status: 400 });
     }
 
+    // Delete all Jada Sinclair records
+    const { error: delJada } = await supabase
+      .from('associates')
+      .delete()
+      .eq('first_name', 'Jada')
+      .eq('last_name', 'Sinclair');
+
+    if (delJada) {
+      console.error('Error deleting Jada:', delJada);
+      return Response.json({ error: `Failed to delete Jada: ${delJada.message}` }, { status: 400 });
+    }
+
     // Get all Jennifers to delete extras
     const { data: jennifers, error: fetchErr } = await supabase
       .from('associates')
