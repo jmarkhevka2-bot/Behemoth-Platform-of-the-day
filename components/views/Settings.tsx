@@ -138,25 +138,81 @@ export default function Settings() {
         </div>
       </section>
 
-      {/* Tier Thresholds */}
+      {/* Tier Configuration */}
       <section className={SECTION}>
-        <h2 className={SECTION_TITLE}>TIER THRESHOLDS</h2>
-        <div className="space-y-1">
+        <h2 className={SECTION_TITLE}>⭐ TIER CONFIGURATION</h2>
+        <p className="text-xs text-[var(--text-muted)] font-body mb-4">Customize tier names, emojis, thresholds, and rewards</p>
+        <div className="space-y-3">
           {settings.tiers.map((tc, i) => (
-            <div key={tc.tier} className="flex items-center gap-3 py-1.5">
-              <span className="text-base leading-none">{tc.emoji}</span>
-              <span className="flex-1 text-sm font-body text-[var(--text-secondary)]">{tc.label}</span>
-              <input type="number" min={1} value={tc.threshold}
-                onChange={e => {
-                  const val = parseInt(e.target.value);
-                  if (!isNaN(val) && val > 0) {
-                    const tiers = [...settings.tiers];
-                    tiers[i] = { ...tc, threshold: val };
-                    dispatch({ type: 'UPDATE_SETTINGS', settings: { tiers } });
-                  }
+            <div key={tc.tier} className="bg-[var(--bg-secondary)] rounded-lg p-3 space-y-2">
+              {/* Tier Header */}
+              <div className="flex items-center gap-2">
+                <input type="text" value={tc.emoji} onChange={e => {
+                  const tiers = [...settings.tiers];
+                  tiers[i] = { ...tc, emoji: e.target.value || '⭐' };
+                  dispatch({ type: 'UPDATE_SETTINGS', settings: { tiers } });
                 }}
-                className="w-20 bg-[var(--bg-input)] border border-[var(--border)] rounded-xl px-2 py-1.5 text-sm text-[var(--accent-gold)] font-heading text-center outline-none focus:border-[var(--accent-gold)]/50" />
-              <span className="text-xs text-[var(--text-muted)] font-body w-6">pts</span>
+                  maxLength={2} className="w-12 text-center text-lg bg-[var(--bg-input)] border border-[var(--border)] rounded-lg px-2 py-1 outline-none focus:border-[var(--accent-gold)]/50" />
+                <input type="text" value={tc.label} onChange={e => {
+                  const tiers = [...settings.tiers];
+                  tiers[i] = { ...tc, label: e.target.value };
+                  dispatch({ type: 'UPDATE_SETTINGS', settings: { tiers } });
+                }}
+                  className="flex-1 bg-[var(--bg-input)] border border-[var(--border)] rounded-lg px-2 py-1 text-sm font-heading text-[var(--text-primary)] outline-none focus:border-[var(--accent-gold)]/50" />
+              </div>
+
+              {/* Threshold & Color */}
+              <div className="flex gap-2 items-end">
+                <div className="flex-1">
+                  <label className="text-[9px] text-[var(--text-muted)] font-body block mb-0.5">Threshold</label>
+                  <input type="number" min={1} value={tc.threshold} onChange={e => {
+                    const val = parseInt(e.target.value);
+                    if (!isNaN(val) && val > 0) {
+                      const tiers = [...settings.tiers];
+                      tiers[i] = { ...tc, threshold: val };
+                      dispatch({ type: 'UPDATE_SETTINGS', settings: { tiers } });
+                    }
+                  }}
+                    className="w-full bg-[var(--bg-input)] border border-[var(--border)] rounded-lg px-2 py-1 text-sm text-[var(--accent-gold)] font-heading text-center outline-none focus:border-[var(--accent-gold)]/50" />
+                </div>
+                <div className="flex-1">
+                  <label className="text-[9px] text-[var(--text-muted)] font-body block mb-0.5">Color</label>
+                  <div className="flex gap-1">
+                    <input type="color" value={tc.color || '#000000'} onChange={e => {
+                      const tiers = [...settings.tiers];
+                      tiers[i] = { ...tc, color: e.target.value };
+                      dispatch({ type: 'UPDATE_SETTINGS', settings: { tiers } });
+                    }}
+                      className="w-10 h-9 rounded-lg border border-[var(--border)] cursor-pointer" />
+                    <input type="text" value={tc.color || '#000000'} onChange={e => {
+                      const tiers = [...settings.tiers];
+                      tiers[i] = { ...tc, color: e.target.value };
+                      dispatch({ type: 'UPDATE_SETTINGS', settings: { tiers } });
+                    }}
+                      maxLength={7} className="flex-1 bg-[var(--bg-input)] border border-[var(--border)] rounded-lg px-2 py-1 text-xs text-[var(--text-primary)] font-body outline-none focus:border-[var(--accent-gold)]/50" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Reward */}
+              <div>
+                <label className="text-[9px] text-[var(--text-muted)] font-body block mb-0.5">Reward Description</label>
+                <input type="text" value={tc.reward || ''} onChange={e => {
+                  const tiers = [...settings.tiers];
+                  tiers[i] = { ...tc, reward: e.target.value };
+                  dispatch({ type: 'UPDATE_SETTINGS', settings: { tiers } });
+                }}
+                  placeholder="e.g. $10 Gift Card" className="w-full bg-[var(--bg-input)] border border-[var(--border)] rounded-lg px-2 py-1 text-xs text-[var(--text-primary)] font-body outline-none focus:border-[var(--accent-gold)]/50" />
+              </div>
+
+              {/* Preview */}
+              <div className="flex items-center gap-2 p-2 bg-[var(--bg-input)] rounded-lg border border-[var(--border-subtle)]">
+                <span className="text-sm">{tc.emoji}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] font-heading text-[var(--text-primary)] truncate">{tc.label}</p>
+                  <p className="text-[9px] text-[var(--text-muted)]">{tc.threshold} pts · {tc.reward || 'No reward set'}</p>
+                </div>
+              </div>
             </div>
           ))}
         </div>
