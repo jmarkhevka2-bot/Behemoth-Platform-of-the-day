@@ -1,7 +1,10 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useMemo } from 'react';
 import type { Associate, TierConfig } from '@/lib/types';
+import { useAppState } from '@/lib/hooks/useAppState';
+import { getTierProgress } from '@/lib/utils/tiers';
 import PointCounter from '@/components/ui/PointCounter';
 import ProgressBar from '@/components/ui/ProgressBar';
 
@@ -22,6 +25,8 @@ export default function PodiumCard({
   onAwardClick,
   nextTierConfig,
 }: Props) {
+  const { state } = useAppState();
+
   const gradients: Record<number, string> = {
     1: 'from-yellow-400 via-yellow-600 to-yellow-500',
     2: 'from-gray-100 via-gray-400 to-gray-300',
@@ -33,6 +38,14 @@ export default function PodiumCard({
     2: 'shadow-lg hover:shadow-xl',
     3: 'shadow-lg hover:shadow-xl',
   };
+
+  // Check if associate is at a tier threshold
+  const tierProgress = useMemo(() =>
+    getTierProgress(associate.seasonPoints, state.settings.tiers),
+    [associate.seasonPoints, state.settings.tiers]
+  );
+  const isAtTierThreshold = tierProgress >= 0.85 && associate.currentTier !== 'legend';
+  const tierGlowClass = isAtTierThreshold ? `tier-glow-${associate.currentTier}` : '';
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -55,7 +68,7 @@ export default function PodiumCard({
       <motion.div
         whileHover={{ y: -4 }}
         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-        className={`bg-gradient-to-br ${gradients[rank]} rounded-2xl p-6 text-center transition-all duration-300 ${glows[rank]}`}
+        className={`bg-gradient-to-br ${gradients[rank]} rounded-2xl p-6 text-center transition-all duration-300 ${glows[rank]} ${tierGlowClass}`}
       >
         <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
           <motion.div

@@ -76,6 +76,55 @@ body {
 .tier-legend  { background: linear-gradient(135deg, #5B21B6, #8B5CF6); }
 .tier-none    { background: transparent; }
 
+/* ── Tier threshold glow borders ────────────────────── */
+.tier-glow-bronze {
+  box-shadow: inset 0 0 12px rgba(200, 137, 90, 0.3), 0 0 12px rgba(200, 137, 90, 0.25);
+  border-color: rgba(200, 137, 90, 0.5) !important;
+  animation: tier-pulse-bronze 2s ease-in-out infinite;
+}
+.tier-glow-silver {
+  box-shadow: inset 0 0 12px rgba(138, 156, 170, 0.3), 0 0 12px rgba(138, 156, 170, 0.25);
+  border-color: rgba(138, 156, 170, 0.5) !important;
+  animation: tier-pulse-silver 2s ease-in-out infinite;
+}
+.tier-glow-gold {
+  box-shadow: inset 0 0 12px rgba(185, 140, 30, 0.3), 0 0 12px rgba(185, 140, 30, 0.25);
+  border-color: rgba(185, 140, 30, 0.5) !important;
+  animation: tier-pulse-gold 2s ease-in-out infinite;
+}
+.tier-glow-diamond {
+  box-shadow: inset 0 0 12px rgba(59, 120, 184, 0.3), 0 0 12px rgba(59, 120, 184, 0.25);
+  border-color: rgba(59, 120, 184, 0.5) !important;
+  animation: tier-pulse-diamond 2s ease-in-out infinite;
+}
+.tier-glow-legend {
+  box-shadow: inset 0 0 12px rgba(124, 58, 237, 0.3), 0 0 12px rgba(124, 58, 237, 0.25);
+  border-color: rgba(124, 58, 237, 0.5) !important;
+  animation: tier-pulse-legend 2s ease-in-out infinite;
+}
+
+/* ── Tier pulse animations ─────────────────────────── */
+@keyframes tier-pulse-bronze {
+  0%, 100% { box-shadow: inset 0 0 12px rgba(200, 137, 90, 0.3), 0 0 12px rgba(200, 137, 90, 0.25); }
+  50% { box-shadow: inset 0 0 12px rgba(200, 137, 90, 0.5), 0 0 16px rgba(200, 137, 90, 0.4); }
+}
+@keyframes tier-pulse-silver {
+  0%, 100% { box-shadow: inset 0 0 12px rgba(138, 156, 170, 0.3), 0 0 12px rgba(138, 156, 170, 0.25); }
+  50% { box-shadow: inset 0 0 12px rgba(138, 156, 170, 0.5), 0 0 16px rgba(138, 156, 170, 0.4); }
+}
+@keyframes tier-pulse-gold {
+  0%, 100% { box-shadow: inset 0 0 12px rgba(185, 140, 30, 0.3), 0 0 12px rgba(185, 140, 30, 0.25); }
+  50% { box-shadow: inset 0 0 12px rgba(185, 140, 30, 0.5), 0 0 16px rgba(185, 140, 30, 0.4); }
+}
+@keyframes tier-pulse-diamond {
+  0%, 100% { box-shadow: inset 0 0 12px rgba(59, 120, 184, 0.3), 0 0 12px rgba(59, 120, 184, 0.25); }
+  50% { box-shadow: inset 0 0 12px rgba(59, 120, 184, 0.5), 0 0 16px rgba(59, 120, 184, 0.4); }
+}
+@keyframes tier-pulse-legend {
+  0%, 100% { box-shadow: inset 0 0 12px rgba(124, 58, 237, 0.3), 0 0 12px rgba(124, 58, 237, 0.25); }
+  50% { box-shadow: inset 0 0 12px rgba(124, 58, 237, 0.5), 0 0 16px rgba(124, 58, 237, 0.4); }
+}
+
 /* ── Shimmer overlay (celebration screens only) ─────────── */
 .shimmer-overlay {
   position: relative;

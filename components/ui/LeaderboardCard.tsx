@@ -1,8 +1,10 @@
 'use client';
 
-import { forwardRef } from 'react';
+import { forwardRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import type { Associate } from '@/lib/types';
+import { useAppState } from '@/lib/hooks/useAppState';
+import { getTierProgress } from '@/lib/utils/tiers';
 import TierBadge from './TierBadge';
 import PointCounter from './PointCounter';
 
@@ -20,8 +22,17 @@ const MEDAL = ['🥇', '🥈', '🥉'];
 const LeaderboardCard = forwardRef<HTMLDivElement, Props>(function LeaderboardCard(
   { associate: a, rank, onCardClick, onAwardClick, isTied, isAdmin = true }, ref
 ) {
+  const { state } = useAppState();
   const isTop3  = rank <= 3;
   const isFirst = rank === 1;
+
+  // Check if associate is at a tier threshold (within 85%+ progress)
+  const tierProgress = useMemo(() =>
+    getTierProgress(a.seasonPoints, state.settings.tiers),
+    [a.seasonPoints, state.settings.tiers]
+  );
+  const isAtTierThreshold = tierProgress >= 0.85 && a.currentTier !== 'legend';
+  const glowClass = isAtTierThreshold ? `tier-glow-${a.currentTier}` : '';
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -43,6 +54,7 @@ const LeaderboardCard = forwardRef<HTMLDivElement, Props>(function LeaderboardCa
       className={`
         flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer
         bg-[var(--bg-card)] border border-l-[3px] select-none transition-shadow active:scale-95
+        ${isAtTierThreshold ? glowClass : ''}
         ${isFirst
           ? 'gold-glow-pulse border-[var(--accent-gold)]/30 accent-gold'
           : 'border-[var(--border)] accent-none hover:shadow-sm'}
