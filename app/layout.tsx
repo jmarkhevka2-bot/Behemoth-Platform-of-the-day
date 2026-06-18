@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Black_Ops_One, Inter } from 'next/font/google';
 import './globals.css';
 import { AppProvider } from '@/lib/context/AppContext';
+import { Analytics } from '@vercel/analytics/next';
 
 const blackOps = Black_Ops_One({
   weight: '400',
@@ -45,6 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="font-body antialiased">
         <AppProvider>{children}</AppProvider>
+        <Analytics />
       </body>
     </html>
   );
